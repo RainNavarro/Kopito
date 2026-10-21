@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KoPito — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+  <style>
+  :root{
+    --espresso:#110700;--roast:#1e0d04;--mahogany:#5c2710;--caramel:#a0522d;
+    --crema:#e8d5b0;--foam:#f5ede0;--gold:#c9a84c;--gold-light:#e0c57a;
+    --surface:#1c0e06;--surface2:#231209;--border:rgba(201,168,76,.13);
+    --muted:rgba(232,213,176,.52);--green:#4ade80;--red:#e23a2d;
+    --amber:#f59e0b;--blue:#60a5fa;
+    --radius-pill:9999px;--radius-lg:1.25rem;--radius-md:.875rem;
+    --ease-out:cubic-bezier(0.22,1,0.36,1);--spring:cubic-bezier(0.34,1.56,0.64,1);
+    --nav-bg:rgba(20,8,2,.82);--nav-blur:blur(24px);--sb:220px;
+  }
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'DM Sans',sans-serif;background:var(--espresso);color:var(--crema);min-height:100vh;overflow-x:hidden;}
+  body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:180px;opacity:.035;pointer-events:none;z-index:9999;}
+
+  /* LOGIN */
+  #gate{position:fixed;inset:0;z-index:8000;background:var(--espresso);display:flex;align-items:center;justify-content:center;padding:1.5rem;}
+  .lg{width:100%;max-width:390px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2.25rem 2rem;box-shadow:0 24px 80px rgba(0,0,0,.6);}
+  .lg__logo{font-family:'Cormorant Garamond',serif;font-size:2.1rem;font-weight:300;color:var(--foam);text-align:center;letter-spacing:.05em;}
+  .lg__logo em{font-style:italic;color:var(--gold);}
+  .lg__badge{display:block;width:fit-content;margin:.4rem auto 1rem;padding:.2rem .8rem;border-radius:var(--radius-pill);background:rgba(226,58,45,.12);border:1px solid rgba(226,58,45,.28);font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--red);}
+  .lg__sub{text-align:center;font-size:.78rem;color:var(--muted);margin-bottom:1.5rem;}
+  .field{display:flex;flex-direction:column;gap:.4rem;margin-bottom:.9rem;}
+  .field__lbl{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:600;}
+  .field input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-md);padding:.8rem 1rem;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--foam);outline:none;transition:border-color .3s,box-shadow .3s;}
+  .field input:focus{border-color:rgba(201,168,76,.5);box-shadow:0 0 0 3px rgba(201,168,76,.09);}
+  .field input::placeholder{color:var(--muted);}
+  .field.err input{border-color:rgba(226,58,45,.5);}
+  .field__err{font-size:.7rem;color:var(--red);display:none;margin-top:.1rem;}
+  .field.err .field__err{display:block;}
+  .lg__btn{width:100%;padding:.88rem;border:none;border-radius:var(--radius-pill);background:linear-gradient(135deg,var(--caramel),var(--mahogany));color:var(--foam);font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:600;cursor:pointer;box-shadow:0 4px 22px rgba(92,39,16,.5);transition:transform .3s var(--spring),box-shadow .3s;}
+  .lg__btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(92,39,16,.7);}
+  .lg__back{display:block;text-align:center;margin-top:1rem;font-size:.82rem;color:var(--gold-light);text-decoration:none;}
+  .lg__back:hover{color:var(--gold);}
+  .lg__hint{margin-top:.8rem;text-align:center;font-size:.7rem;color:var(--muted);padding:.5rem .75rem;background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.12);border-radius:var(--radius-md);}
+  .lg__hint strong{color:var(--gold-light);}
+
+  /* SHELL */
+  #shell{display:none;min-height:100vh;}
+  #shell.on{display:flex;}
+
+  /* SIDEBAR */
+  .sb{width:var(--sb);flex-shrink:0;background:var(--roast);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:100;transition:transform .4s var(--ease-out);}
+  .sb__brand{padding:1.4rem 1.2rem .9rem;border-bottom:1px solid var(--border);}
+  .sb__name{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:300;color:var(--foam);letter-spacing:.05em;}
+  .sb__name em{font-style:italic;color:var(--gold);}
+  .sb__tag{display:inline-flex;align-items:center;gap:.3rem;margin-top:.3rem;padding:.17rem .6rem;border-radius:var(--radius-pill);background:rgba(226,58,45,.12);border:1px solid rgba(226,58,45,.22);font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;font-weight:700;color:var(--red);}
+  .sb__nav{flex:1;padding:.6rem .55rem;display:flex;flex-direction:column;gap:.08rem;}
+  .sb__sec{font-size:.55rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(201,168,76,.38);padding:.55rem .7rem .15rem;font-weight:600;}
+  .sb__lnk{display:flex;align-items:center;gap:.6rem;padding:.56rem .7rem;border-radius:var(--radius-md);color:var(--muted);font-size:.83rem;font-weight:500;cursor:pointer;text-decoration:none;border:1px solid transparent;transition:background .2s,color .2s,transform .25s var(--spring);-webkit-tap-highlight-color:transparent;}
+  .sb__lnk:hover{background:rgba(201,168,76,.07);color:var(--crema);transform:translateX(2px);}
+  .sb__lnk.on{background:rgba(201,168,76,.12);color:var(--gold-light);border-color:rgba(201,168,76,.18);}
+  .sb__lnk svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+  .sb__bdg{margin-left:auto;background:var(--gold);color:var(--espresso);border-radius:var(--radius-pill);font-size:.58rem;font-weight:700;padding:.05rem .45rem;}
+  .sb__foot{padding:.8rem 1rem;border-top:1px solid var(--border);}
+  .sb__user{display:flex;align-items:center;gap:.6rem;}
+  .sb__av{width:2.1rem;height:2.1rem;border-radius:50%;background:linear-gradient(135deg,var(--caramel),var(--mahogany));border:1px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:1.05rem;color:var(--foam);flex-shrink:0;}
+  .sb__uname{font-size:.8rem;font-weight:600;color:var(--foam);}
+  .sb__urole{font-size:.62rem;color:var(--red);}
+  .sb__out{display:flex;align-items:center;gap:.4rem;margin-top:.5rem;font-size:.74rem;color:var(--muted);cursor:pointer;transition:color .2s;}
+  .sb__out:hover{color:var(--red);}
+  .sb__out svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+  /* Mobile sidebar */
+  .sb-ov{display:none;position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.55);}
+  .mob-sb{display:none;position:fixed;top:.7rem;left:.8rem;z-index:200;width:2.4rem;height:2.4rem;border-radius:.625rem;background:rgba(17,7,0,.9);backdrop-filter:blur(12px);border:1px solid var(--border);cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:4px;-webkit-tap-highlight-color:transparent;}
+  .mob-sb span{display:block;width:15px;height:1.5px;background:var(--gold);border-radius:2px;transition:transform .3s var(--spring),opacity .2s;}
+  .mob-sb.open span:nth-child(1){transform:translateY(5.5px) rotate(45deg);}
+  .mob-sb.open span:nth-child(2){opacity:0;}
+  .mob-sb.open span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg);}
+  @media(max-width:767px){
+    .mob-sb{display:flex;}
+    .sb{position:fixed;top:0;left:0;height:100%;transform:translateX(-100%);z-index:150;}
+    .sb.open{transform:none;}
+    .sb-ov.open{display:block;}
+    .main{padding-top:3.5rem !important;}
+  }
+
+  /* MAIN */
+  .main{flex:1;min-width:0;display:flex;flex-direction:column;}
+  .topbar{background:rgba(17,7,0,.88);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:.6rem 1.4rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;position:sticky;top:0;z-index:90;flex-shrink:0;}
+  .topbar__title{font-family:'DM Serif Display',serif;font-size:1.05rem;color:var(--foam);}
+  .topbar__title em{font-style:italic;color:var(--gold-light);}
+  .topbar__r{display:flex;align-items:center;gap:.65rem;}
+  .ldot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px rgba(74,222,128,.7);animation:ldot 2s ease-in-out infinite;}
+  @keyframes ldot{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.75);}}
+  .tb-btn{background:rgba(201,168,76,.07);border:1px solid var(--border);border-radius:.5rem;padding:.3rem .7rem;font-size:.73rem;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:.3rem;transition:background .2s,color .2s;}
+  .tb-btn:hover{background:rgba(201,168,76,.14);color:var(--crema);}
+  .tb-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* PANELS */
+  .panel{display:none;padding:1.4rem;flex:1;animation:pfade .3s var(--ease-out);}
+  .panel.on{display:block;}
+  @keyframes pfade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  .ptitle{font-family:'DM Serif Display',serif;font-size:1.25rem;color:var(--foam);margin-bottom:1rem;display:flex;align-items:center;gap:.6rem;}
+  .ptitle em{font-style:italic;color:var(--gold-light);}
+  .ptitle::after{content:'';flex:1;height:1px;background:rgba(201,168,76,.14);}
+
+  /* KPIs */
+  .kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.7rem;margin-bottom:1.4rem;}
+  @media(min-width:640px){.kpi-grid{grid-template-columns:repeat(4,1fr);}}
+  .kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem .95rem;position:relative;overflow:hidden;transition:transform .35s var(--spring),border-color .3s;}
+  .kpi:hover{transform:translateY(-3px);border-color:rgba(201,168,76,.28);}
+  .kpi__lbl{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:.38rem;}
+  .kpi__val{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:600;color:var(--foam);line-height:1;}
+  .kpi__d{font-size:.7rem;margin-top:.28rem;}
+  .kpi__d.up{color:var(--green);}.kpi__d.dn{color:var(--red);}
+  .kpi__ico{position:absolute;top:.8rem;right:.8rem;width:1.7rem;height:1.7rem;border-radius:.45rem;display:flex;align-items:center;justify-content:center;}
+  .kpi__ico svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .kpi--rev .kpi__ico{background:rgba(201,168,76,.1);color:var(--gold);}
+  .kpi--ord .kpi__ico{background:rgba(96,165,250,.1);color:var(--blue);}
+  .kpi--pts .kpi__ico{background:rgba(245,158,11,.1);color:var(--amber);}
+  .kpi--res .kpi__ico{background:rgba(74,222,128,.1);color:var(--green);}
+
+  /* TWO COL */
+  .two-col{display:grid;grid-template-columns:1fr;gap:1rem;}
+  @media(min-width:768px){.two-col{grid-template-columns:1.45fr 1fr;}}
+
+  /* BAR CHART */
+  .chart-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.2rem;}
+  .chart-box__h{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem;}
+  .chart-box__t{font-family:'DM Serif Display',serif;font-size:.95rem;color:var(--foam);}
+  .chart-box__s{font-size:.68rem;color:var(--muted);margin-top:.1rem;}
+  .bars{display:flex;align-items:flex-end;gap:.35rem;height:90px;}
+  .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:.25rem;}
+  .bar{width:100%;border-radius:.2rem .2rem 0 0;background:linear-gradient(to top,var(--mahogany),var(--caramel));min-height:4px;position:relative;cursor:pointer;transition:filter .2s;}
+  .bar:hover{filter:brightness(1.18);}
+  .bar.today{background:linear-gradient(to top,rgba(201,168,76,.5),var(--gold));}
+  .bar::after{content:attr(data-t);position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid var(--border);border-radius:.4rem;padding:.2rem .5rem;font-size:.62rem;color:var(--crema);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s;}
+  .bar:hover::after{opacity:1;}
+  .bar-day{font-size:.58rem;color:var(--muted);}
+
+  /* TOP ITEMS */
+  .items-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.2rem;}
+  .items-box__t{font-family:'DM Serif Display',serif;font-size:.95rem;color:var(--foam);margin-bottom:.9rem;}
+  .ti{display:flex;align-items:center;gap:.65rem;padding:.42rem 0;border-bottom:1px solid rgba(201,168,76,.06);}
+  .ti:last-child{border-bottom:none;}
+  .ti__rk{font-family:'Cormorant Garamond',serif;font-size:1.05rem;color:var(--gold);width:1.2rem;text-align:center;flex-shrink:0;}
+  .ti__info{flex:1;min-width:0;}
+  .ti__name{font-size:.82rem;color:var(--foam);font-weight:500;}
+  .ti__bar{height:3px;border-radius:2px;background:rgba(201,168,76,.3);margin-top:.2rem;}
+  .ti__meta{font-size:.72rem;color:var(--muted);text-align:right;}
+  .ti__rev{font-size:.68rem;color:var(--gold);}
+
+  /* ORDERS */
+  .toolbar{display:flex;align-items:center;gap:.45rem;margin-bottom:1rem;flex-wrap:wrap;}
+  .fp{padding:.3rem .78rem;border-radius:var(--radius-pill);font-size:.73rem;font-weight:500;color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--border);cursor:pointer;transition:background .2s,color .2s,border-color .2s;-webkit-tap-highlight-color:transparent;}
+  .fp.on{background:rgba(201,168,76,.13);border-color:rgba(201,168,76,.42);color:var(--gold-light);}
+  .srch{flex:1;min-width:120px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-pill);padding:.36rem .85rem;font-family:'DM Sans',sans-serif;font-size:.8rem;color:var(--foam);outline:none;transition:border-color .3s;}
+  .srch::placeholder{color:var(--muted);}
+  .srch:focus{border-color:rgba(201,168,76,.42);}
+  .tbl-wrap{overflow-x:auto;border-radius:var(--radius-lg);border:1px solid var(--border);}
+  table{width:100%;border-collapse:collapse;font-size:.8rem;}
+  th{text-align:left;padding:.5rem .7rem;font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid var(--border);font-weight:600;white-space:nowrap;}
+  td{padding:.58rem .7rem;border-bottom:1px solid rgba(201,168,76,.05);color:var(--crema);vertical-align:middle;}
+  tr:hover td{background:rgba(201,168,76,.025);}
+  tr:last-child td{border-bottom:none;}
+
+  /* STATUS PILLS */
+  .pill{display:inline-block;padding:.13rem .52rem;border-radius:var(--radius-pill);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;font-weight:600;}
+  .pill.pending  {background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.22);}
+  .pill.making   {background:rgba(96,165,250,.1);color:var(--blue);border:1px solid rgba(96,165,250,.22);}
+  .pill.ready    {background:rgba(201,168,76,.12);color:var(--gold-light);border:1px solid rgba(201,168,76,.3);}
+  .pill.delivered{background:rgba(74,222,128,.1);color:var(--green);border:1px solid rgba(74,222,128,.22);}
+  .pill.completed{background:rgba(74,222,128,.1);color:var(--green);border:1px solid rgba(74,222,128,.22);}
+  .pill.cancelled{background:rgba(226,58,45,.1);color:var(--red);border:1px solid rgba(226,58,45,.22);}
+  .pill.confirmed{background:rgba(74,222,128,.1);color:var(--green);border:1px solid rgba(74,222,128,.22);}
+
+  /* STATUS SELECT */
+  .ssel{background:var(--surface2);border:1px solid var(--border);border-radius:.45rem;padding:.26rem .48rem;font-family:'DM Sans',sans-serif;font-size:.72rem;color:var(--crema);outline:none;cursor:pointer;transition:border-color .2s;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23c9a84c' stroke-width='2.5' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .4rem center;padding-right:1.4rem;}
+  .ssel:focus{border-color:rgba(201,168,76,.42);}
+  .ssel option{background:#1c0e06;color:var(--foam);}
+
+  /* RESERVATIONS */
+  .res-grid{display:grid;grid-template-columns:1fr;gap:.7rem;}
+  @media(min-width:600px){.res-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(min-width:1024px){.res-grid{grid-template-columns:repeat(3,1fr);}}
+  .rc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;}
+  .rc.confirmed{border-color:rgba(74,222,128,.2);}
+  .rc__top{display:flex;align-items:flex-start;justify-content:space-between;gap:.4rem;margin-bottom:.65rem;}
+  .rc__ref{font-size:.6rem;color:var(--gold);letter-spacing:.12em;font-weight:600;}
+  .rc__type{font-size:.85rem;font-weight:600;color:var(--foam);}
+  .rc__row{display:flex;align-items:center;gap:.42rem;font-size:.75rem;color:var(--muted);margin-bottom:.25rem;}
+  .rc__row svg{width:11px;height:11px;stroke:var(--gold);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+  .rc__btns{display:flex;gap:.38rem;margin-top:.75rem;}
+  .rcb{flex:1;padding:.36rem;border-radius:.5rem;font-size:.7rem;font-weight:600;border:none;cursor:pointer;transition:background .2s,transform .2s var(--spring);}
+  .rcb:hover{transform:translateY(-1px);}
+  .rcb.ok{background:rgba(74,222,128,.12);color:var(--green);border:1px solid rgba(74,222,128,.28);}
+  .rcb.ok:hover{background:rgba(74,222,128,.22);}
+  .rcb.no{background:rgba(226,58,45,.1);color:var(--red);border:1px solid rgba(226,58,45,.22);}
+  .rcb.no:hover{background:rgba(226,58,45,.2);}
+
+  /* MENU */
+  .mgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:.65rem;}
+  @media(min-width:540px){.mgrid{grid-template-columns:repeat(3,1fr);}}
+  @media(min-width:900px){.mgrid{grid-template-columns:repeat(4,1fr);}}
+  .mc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;}
+  .mc img{width:100%;aspect-ratio:1;object-fit:cover;display:block;}
+  .mc__b{padding:.72rem;}
+  .mc__n{font-size:.85rem;font-weight:600;color:var(--foam);}
+  .mc__c{font-size:.6rem;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;margin:.1rem 0 .42rem;}
+  .mc__r{display:flex;align-items:center;justify-content:space-between;}
+  .mc__p{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--crema);}
+  .atog{display:flex;align-items:center;gap:.32rem;font-size:.68rem;}
+  .sw{position:relative;display:inline-block;width:2rem;height:1.1rem;}
+  .sw input{opacity:0;width:0;height:0;}
+  .sw-tr{position:absolute;inset:0;background:rgba(255,255,255,.08);border:1px solid var(--border);border-radius:var(--radius-pill);cursor:pointer;transition:background .3s,border-color .3s;}
+  .sw input:checked + .sw-tr{background:rgba(74,222,128,.2);border-color:rgba(74,222,128,.42);}
+  .sw-tr::after{content:'';position:absolute;width:.74rem;height:.74rem;border-radius:50%;background:var(--muted);top:.13rem;left:.11rem;transition:transform .3s var(--spring),background .3s;}
+  .sw input:checked + .sw-tr::after{transform:translateX(.9rem);background:var(--green);}
+
+  /* MESSAGES */
+  .mlist{display:flex;flex-direction:column;gap:.55rem;}
+  .msg{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:.9rem 1rem;cursor:pointer;transition:border-color .2s,background .2s;}
+  .msg:hover{border-color:rgba(201,168,76,.28);background:rgba(28,14,6,.8);}
+  .msg.unread{border-left:3px solid var(--gold);}
+  .msg__top{display:flex;align-items:flex-start;justify-content:space-between;gap:.65rem;margin-bottom:.28rem;}
+  .msg__from{font-size:.85rem;font-weight:600;color:var(--foam);display:flex;align-items:center;gap:.42rem;}
+  .msg__dot{width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;}
+  .msg__time{font-size:.66rem;color:var(--muted);flex-shrink:0;}
+  .msg__subj{font-size:.78rem;color:var(--crema);margin-bottom:.2rem;}
+  .msg__prev{font-size:.74rem;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden; line-clamp: 2;}
+
+  /* TOAST */
+  .toast{position:fixed;top:1rem;left:50%;transform:translateX(-50%) translateY(-70px);z-index:9500;background:var(--surface);border:1px solid rgba(201,168,76,.28);border-radius:var(--radius-pill);padding:.56rem 1.3rem;display:flex;align-items:center;gap:.5rem;box-shadow:0 8px 28px rgba(0,0,0,.5);font-size:.82rem;font-weight:500;color:var(--foam);transition:transform .5s var(--ease-out),opacity .5s;opacity:0;white-space:nowrap;}
+  .toast.on{transform:translateX(-50%) translateY(0);opacity:1;}
+  .toast svg{width:14px;height:14px;stroke:var(--green);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+
+  ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:rgba(201,168,76,.18);border-radius:2px;}
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;}}
+  </style>
+</head>
+<body>
+
+<!-- LOGIN GATE -->
+<div id="gate">
+  <div class="lg">
+    <div class="lg__logo">Ko<em>Pito</em></div>
+    <span class="lg__badge">⚙ Admin Access Only</span>
+    <p class="lg__sub">Owner credentials required</p>
+    <form id="lgForm" novalidate>
+      <div class="field" id="fe">
+        <label class="field__lbl" for="lgE">Email</label>
+        <input type="email" id="lgE" placeholder="admin@kopito.coffee" autocomplete="username"/>
+        <span class="field__err">Enter the admin email.</span>
+      </div>
+      <div class="field" id="fp">
+        <label class="field__lbl" for="lgP">Password</label>
+        <input type="password" id="lgP" placeholder="••••••••" autocomplete="current-password"/>
+        <span class="field__err" id="perr">Password required.</span>
+      </div>
+      <button type="submit" class="lg__btn">Access Dashboard</button>
+    </form>
+    <a href="Account.html" class="lg__back">← Back to Account</a>
+    <div class="lg__hint">Demo — Email: <strong>admin@kopito.coffee</strong> &nbsp;·&nbsp; Password: <strong>kopito2025</strong></div>
+  </div>
+</div>
+
+<!-- ADMIN SHELL -->
+<div id="shell">
+  <div class="sb-ov" id="sbOv"></div>
+
+  <!-- Sidebar -->
+  <aside class="sb" id="sb">
+    <div class="sb__brand">
+      <div class="sb__name">Ko<em>Pito</em></div>
+      <span class="sb__tag">⚙ Admin Panel</span>
+    </div>
+    <nav class="sb__nav" id="sbNav">
+      <div class="sb__sec">Overview</div>
+      <a class="sb__lnk on" data-p="overview">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard
+      </a>
+      <div class="sb__sec" style="margin-top:.4rem">Manage</div>
+      <a class="sb__lnk" data-p="orders">
+        <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        Orders<span class="sb__bdg" id="obdg">2</span>
+      </a>
+      <a class="sb__lnk" data-p="reservations">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Reservations
+      </a>
+      <a class="sb__lnk" data-p="menu">
+        <svg viewBox="0 0 24 24"><path d="M17 8h1a4 4 0 010 8h-1"/><path d="M3 8h14v9a4 4 0 01-4 4H7a4 4 0 01-4-4V8z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>Menu Items
+      </a>
+      <a class="sb__lnk" data-p="messages">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Messages<span class="sb__bdg" id="mbdg">3</span>
+      </a>
+      <div class="sb__sec" style="margin-top:.4rem">Site</div>
+      <a href="Home.html" class="sb__lnk">
+        <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V21a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>View Site
+      </a>
+      <a href="Account.html" class="sb__lnk">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Account
+      </a>
+    </nav>
+    <div class="sb__foot">
+      <div class="sb__user">
+        <div class="sb__av" id="sbAv">A</div>
+        <div><div class="sb__uname" id="sbN">Admin</div><div class="sb__urole">Owner</div></div>
+      </div>
+      <div class="sb__out" id="outBtn">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <button class="mob-sb" id="mobSb"><span></span><span></span><span></span></button>
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar__title" id="ttl">Dashboard <em>Overview</em></div>
+      <div class="topbar__r">
+        <div class="ldot"></div>
+        <button class="tb-btn" onclick="doRefresh()">
+          <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>Refresh
+        </button>
+      </div>
+    </div>
+
+    <!-- OVERVIEW -->
+    <div class="panel on" id="panel-overview">
+      <div class="kpi-grid">
+        <div class="kpi kpi--rev">
+          <div class="kpi__ico"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+          <div class="kpi__lbl">Today's Revenue</div>
+          <div class="kpi__val">₱<span id="kRev">4,820</span></div>
+          <div class="kpi__d up">↑ 12% vs yesterday</div>
+        </div>
+        <div class="kpi kpi--ord">
+          <div class="kpi__ico"><svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></div>
+          <div class="kpi__lbl">Orders Today</div>
+          <div class="kpi__val" id="kOrd">38</div>
+          <div class="kpi__d up">↑ 8 from yesterday</div>
+        </div>
+        <div class="kpi kpi--pts">
+          <div class="kpi__ico"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+          <div class="kpi__lbl">Points Redeemed</div>
+          <div class="kpi__val" id="kPts">2,150</div>
+          <div class="kpi__d dn">↓ 5% this week</div>
+        </div>
+        <div class="kpi kpi--res">
+          <div class="kpi__ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          <div class="kpi__lbl">Pending Bookings</div>
+          <div class="kpi__val" id="kRes">5</div>
+          <div class="kpi__d up">2 new today</div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="chart-box">
+          <div class="chart-box__h">
+            <div><div class="chart-box__t">Weekly Revenue</div><div class="chart-box__s">Gold bar = today</div></div>
+          </div>
+          <div class="bars" id="bars"></div>
+        </div>
+        <div class="items-box">
+          <div class="items-box__t">Top Selling Items</div>
+          <div id="topItems"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORDERS -->
+    <div class="panel" id="panel-orders">
+      <div class="ptitle">Order <em>Management</em></div>
+      <div class="toolbar">
+        <button class="fp on" data-of="all">All</button>
+        <button class="fp" data-of="pending">Pending</button>
+        <button class="fp" data-of="making">Making</button>
+        <button class="fp" data-of="ready">Ready</button>
+        <button class="fp" data-of="completed">Completed</button>
+        <input class="srch" id="oSrch" placeholder="Search ref or customer…"/>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Ref</th><th>Customer</th><th>Items</th><th>Total</th><th>Pay</th><th>Status</th><th>Time</th><th>Update</th></tr></thead>
+          <tbody id="oBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- RESERVATIONS -->
+    <div class="panel" id="panel-reservations">
+      <div class="ptitle">Reservation <em>Requests</em></div>
+      <div class="toolbar">
+        <button class="fp on" data-rf="all">All</button>
+        <button class="fp" data-rf="pending">Pending</button>
+        <button class="fp" data-rf="confirmed">Confirmed</button>
+        <button class="fp" data-rf="booth">Booth Hire</button>
+      </div>
+      <div class="res-grid" id="resGrid"></div>
+    </div>
+
+    <!-- MENU -->
+    <div class="panel" id="panel-menu">
+      <div class="ptitle">Menu <em>Items</em></div>
+      <div class="toolbar">
+        <button class="fp on" data-mf="all">All</button>
+        <button class="fp" data-mf="hot">Hot</button>
+        <button class="fp" data-mf="iced">Iced</button>
+        <button class="fp" data-mf="pastries">Pastries</button>
+        <button class="fp" data-mf="noncoffee">Non-Coffee</button>
+      </div>
+      <div class="mgrid" id="mgrid"></div>
+    </div>
+
+    <!-- MESSAGES -->
+    <div class="panel" id="panel-messages">
+      <div class="ptitle">Customer <em>Messages</em></div>
+      <div class="mlist" id="mlist"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="toastTxt"></span>
+</div>
+
+<script>
+/* ── CREDENTIALS ── */
+const ADMIN_EMAIL='admin@kopito.coffee', ADMIN_PASS='kopito2025';
+
+/* ── DATA ── */
+const ORDERS=[
+  {id:'KP-038',customer:'Maria Santos',   items:'Cappuccino ×2, Croissant',    total:325,pay:'Cash', status:'completed',time:'9:42 AM'},
+  {id:'KP-037',customer:'Juan de la Cruz',items:'Cold Brew, Matcha Latte',     total:305,pay:'GCash',status:'making',   time:'9:18 AM'},
+  {id:'KP-036',customer:'Ana Reyes',      items:'Americano, Cheesecake',       total:225,pay:'Cash', status:'pending',  time:'8:55 AM'},
+  {id:'KP-035',customer:'Carlo Mendoza',  items:'Iced Latte ×3',               total:390,pay:'Card', status:'ready',    time:'8:30 AM'},
+  {id:'KP-034',customer:'Sofia Lim',      items:'Espresso, Muffin ×2',         total:235,pay:'GCash',status:'completed',time:'8:12 AM'},
+  {id:'KP-033',customer:'Renz Bautista',  items:'Caramel Latte',               total:145,pay:'Cash', status:'cancelled',time:'7:58 AM'},
+  {id:'KP-032',customer:'Diane Torres',   items:'Hot Choco, Croissant',        total:195,pay:'GCash',status:'delivered',time:'7:44 AM'},
+  {id:'KP-031',customer:'Mark Villanueva',items:'Cappuccino, Mango Soda',      total:215,pay:'Cash', status:'pending',  time:'7:30 AM'},
+];
+const RESERVATIONS=[
+  {ref:'KP-R014',type:'Corporate',name:'BDO Team',     phone:'+63 917 123 4567',date:'Jun 10',time:'6:00 PM',guests:25,booth:false,status:'pending'},
+  {ref:'KP-R013',type:'Wedding',  name:'Santos-Reyes', phone:'+63 919 987 6543',date:'Jun 8', time:'4:00 PM',guests:80,booth:true, status:'pending'},
+  {ref:'KP-R012',type:'Birthday', name:'Lim Family',   phone:'+63 918 555 0001',date:'Jun 6', time:'7:00 PM',guests:20,booth:false,status:'confirmed'},
+  {ref:'KP-R011',type:'Corporate',name:'Accenture PH', phone:'+63 920 444 3322',date:'Jun 5', time:'2:00 PM',guests:15,booth:true, status:'confirmed'},
+  {ref:'KP-R010',type:'Birthday', name:'Mendoza Party',phone:'+63 912 888 7766',date:'Jun 3', time:'5:30 PM',guests:30,booth:false,status:'confirmed'},
+];
+const MENU_ITEMS=[
+  {name:'Espresso',    cat:'hot',      price:85, img:'https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?w=280&q=70&auto=format',available:true},
+  {name:'Americano',   cat:'hot',      price:95, img:'https://images.unsplash.com/photo-1521302200778-33500795e128?w=280&q=70&auto=format',available:true},
+  {name:'Cappuccino',  cat:'hot',      price:120,img:'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=280&q=70&auto=format',available:true},
+  {name:'Caramel Latte',cat:'hot',     price:145,img:'https://images.unsplash.com/photo-1534778101976-62847782c213?w=280&q=70&auto=format',available:true},
+  {name:'Iced Latte',  cat:'iced',     price:130,img:'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=280&q=70&auto=format',available:true},
+  {name:'Cold Brew',   cat:'iced',     price:150,img:'https://images.unsplash.com/photo-1545239351-1141bd82e8a6?w=280&q=70&auto=format',available:true},
+  {name:'Iced Americano',cat:'iced',   price:105,img:'https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=280&q=70&auto=format',available:false},
+  {name:'Iced Matcha', cat:'iced',     price:155,img:'https://images.unsplash.com/photo-1515823662972-da6a2e4d3002?w=280&q=70&auto=format',available:true},
+  {name:'Croissant',   cat:'pastries', price:85, img:'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=280&q=70&auto=format',available:true},
+  {name:'Cheesecake',  cat:'pastries', price:130,img:'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=280&q=70&auto=format',available:true},
+  {name:'Choco Muffin',cat:'pastries', price:75, img:'https://images.unsplash.com/photo-1607958996333-41aef7caefaa?w=280&q=70&auto=format',available:true},
+  {name:'Hot Chocolate',cat:'noncoffee',price:110,img:'https://images.unsplash.com/photo-1542990253-0d0f5be5f0ed?w=280&q=70&auto=format',available:true},
+  {name:'Mango Soda',  cat:'noncoffee',price:95, img:'https://images.unsplash.com/photo-1560508180-03f285f67ded?w=280&q=70&auto=format',available:true},
+];
+const MSGS=[
+  {from:'Diana Cruz',  subj:'Allergy question — matcha',   prev:"Hi! I wanted to ask if your matcha latte contains any dairy. My daughter is lactose-intolerant…",         time:'Today, 9:20 AM',unread:true},
+  {from:'Ben Torres',  subj:'Booth hire inquiry — June 20',prev:"Hello! We are interested in hiring the coffee booth for our team building on June 20 in BGC…",            time:'Today, 8:05 AM',unread:true},
+  {from:'Lena Aquino', subj:'Reservation follow-up',       prev:"Good morning! I submitted a reservation request last Tuesday for a birthday dinner and haven't heard back…",time:'Yesterday',    unread:true},
+  {from:'Marc Flores', subj:'Feedback — cold brew',        prev:"Just wanted to say the cold brew yesterday was absolutely incredible. The 18-hour steep is very noticeable…",time:'May 28',      unread:false},
+  {from:'Iris Santos', subj:'Points redemption issue',     prev:"I tried to redeem my points for a free cappuccino but the button seems disabled even though I have 600 pts…",time:'May 27',      unread:false},
+];
+const WEEKLY=[{d:'Mon',v:3200},{d:'Tue',v:3800},{d:'Wed',v:4100},{d:'Thu',v:3600},{d:'Fri',v:4820},{d:'Sat',v:0},{d:'Sun',v:0}];
+const TOP=[{n:'Cappuccino',s:142,p:120},{n:'Cold Brew',s:118,p:150},{n:'Iced Latte',s:103,p:130},{n:'Cheesecake',s:89,p:130},{n:'Croissant',s:76,p:85}];
+
+/* ── AUTH ── */
+if(sessionStorage.getItem('kp_adm')==='1') boot(sessionStorage.getItem('kp_adm_n')||'Admin');
+document.getElementById('lgForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const em=document.getElementById('lgE').value.trim(), pw=document.getElementById('lgP').value;
+  const fe=document.getElementById('fe'), fp=document.getElementById('fp');
+  let ok=true;
+  if(!em){fe.classList.add('err');ok=false;}else fe.classList.remove('err');
+  if(!pw){fp.classList.add('err');ok=false;}else fp.classList.remove('err');
+  if(!ok)return;
+  if(em===ADMIN_EMAIL&&pw===ADMIN_PASS){
+    sessionStorage.setItem('kp_adm','1');
+    sessionStorage.setItem('kp_adm_n',em.split('@')[0]);
+    boot(em.split('@')[0]);
+  }else{
+    fp.classList.add('err');
+    document.getElementById('perr').textContent='Wrong credentials. Please try again.';
+  }
+});
+document.getElementById('outBtn').addEventListener('click',()=>{
+  sessionStorage.removeItem('kp_adm');sessionStorage.removeItem('kp_adm_n');location.reload();
+});
+function boot(name){
+  document.getElementById('gate').style.display='none';
+  document.getElementById('shell').classList.add('on');
+  document.getElementById('sbN').textContent=name.charAt(0).toUpperCase()+name.slice(1);
+  document.getElementById('sbAv').textContent=name.charAt(0).toUpperCase();
+  buildAll();
+}
+
+/* ── ROUTING ── */
+const TITLES={overview:'Dashboard <em>Overview</em>',orders:'Order <em>Management</em>',reservations:'Reservation <em>Requests</em>',menu:'Menu <em>Items</em>',messages:'Customer <em>Messages</em>'};
+document.getElementById('sbNav').addEventListener('click',e=>{
+  const lnk=e.target.closest('[data-p]');
+  if(!lnk)return;
+  const k=lnk.dataset.p;
+  document.querySelectorAll('.sb__lnk').forEach(l=>l.classList.remove('on'));
+  lnk.classList.add('on');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.getElementById('panel-'+k).classList.add('on');
+  document.getElementById('ttl').innerHTML=TITLES[k]||k;
+  closeSb();
+});
+
+/* ── BUILD ALL ── */
+function buildAll(){buildBars();buildTop();buildOrders();buildRes();buildMenu();buildMsgs();updBadges();}
+
+function doRefresh(){
+  document.getElementById('kRev').textContent=(4820+Math.floor(Math.random()*300-150)).toLocaleString();
+  toast('Dashboard refreshed ✓');
+}
+
+/* ── BARS ── */
+function buildBars(){
+  const el=document.getElementById('bars');el.innerHTML='';
+  const max=Math.max(...WEEKLY.map(w=>w.v),1);
+  const tod=(new Date().getDay()+6)%7;
+  WEEKLY.forEach((w,i)=>{
+    const pct=w.v?Math.round((w.v/max)*86)+8:3;
+    const col=document.createElement('div');col.className='bar-col';
+    col.innerHTML=`<div class="bar${i===tod?' today':''}" style="height:${pct}%" data-t="${w.v?'₱'+w.v.toLocaleString():'—'}"></div><div class="bar-day">${w.d}</div>`;
+    el.appendChild(col);
+  });
+}
+
+/* ── TOP ITEMS ── */
+function buildTop(){
+  const el=document.getElementById('topItems');el.innerHTML='';
+  const mx=TOP[0].s;
+  TOP.forEach((it,i)=>{
+    el.innerHTML+=`<div class="ti"><div class="ti__rk">${i+1}</div><div class="ti__info"><div class="ti__name">${it.n}</div><div class="ti__bar" style="width:${Math.round(it.s/mx*100)}%"></div></div><div><div class="ti__meta">${it.s} sold</div><div class="ti__rev">₱${(it.s*it.p).toLocaleString()}</div></div></div>`;
+  });
+}
+
+/* ── ORDERS ── */
+let oFil='all',oQ='';
+function buildOrders(){
+  const body=document.getElementById('oBody');body.innerHTML='';
+  const rows=ORDERS.filter(o=>(oFil==='all'||o.status===oFil)&&(!oQ||o.customer.toLowerCase().includes(oQ)||o.id.toLowerCase().includes(oQ)));
+  if(!rows.length){body.innerHTML=`<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted)">No orders found</td></tr>`;return;}
+  rows.forEach(o=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td style="color:var(--gold);font-size:.72rem">${o.id}</td>
+      <td style="font-weight:500">${o.customer}</td>
+      <td style="color:var(--muted);font-size:.75rem;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${o.items}</td>
+      <td style="font-family:'Cormorant Garamond',serif;font-size:1rem">₱${o.total.toLocaleString()}</td>
+      <td style="font-size:.76rem">${o.pay}</td>
+      <td><span class="pill ${o.status}" id="pill-${o.id}">${o.status}</span></td>
+      <td style="color:var(--muted);font-size:.72rem">${o.time}</td>
+      <td>
+        <select class="ssel" data-id="${o.id}">
+          <option value="pending"   ${o.status==='pending'   ?'selected':''}>Pending</option>
+          <option value="making"    ${o.status==='making'    ?'selected':''}>Making</option>
+          <option value="ready"     ${o.status==='ready'     ?'selected':''}>Ready for Pickup</option>
+          <option value="delivered" ${o.status==='delivered' ?'selected':''}>Delivered</option>
+          <option value="completed" ${o.status==='completed' ?'selected':''}>Completed</option>
+          <option value="cancelled" ${o.status==='cancelled' ?'selected':''}>Cancelled</option>
+        </select>
+      </td>`;
+    body.appendChild(tr);
+  });
+  body.querySelectorAll('.ssel').forEach(sel=>{
+    sel.addEventListener('change',()=>{
+      const entry=ORDERS.find(o=>o.id===sel.dataset.id);
+      if(entry){
+        entry.status=sel.value;
+        const pill=document.getElementById('pill-'+entry.id);
+        if(pill){pill.className='pill '+sel.value;pill.textContent=sel.value==='ready'?'Ready for Pickup':sel.value;}
+        updBadges();
+        toast(`${entry.id} → ${sel.value}`);
+      }
+    });
+  });
+}
+document.querySelectorAll('[data-of]').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('[data-of]').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  oFil=b.dataset.of;buildOrders();
+}));
+document.getElementById('oSrch').addEventListener('input',e=>{oQ=e.target.value.toLowerCase().trim();buildOrders();});
+
+/* ── RESERVATIONS ── */
+let rFil='all';
+function buildRes(f=rFil){
+  const grid=document.getElementById('resGrid');grid.innerHTML='';
+  const rows=RESERVATIONS.filter(r=>f==='all'||(f==='pending'&&r.status==='pending')||(f==='confirmed'&&r.status==='confirmed')||(f==='booth'&&r.booth));
+  if(!rows.length){grid.innerHTML=`<div style="color:var(--muted);font-size:.85rem;padding:1rem">No reservations found.</div>`;return;}
+  rows.forEach(r=>{
+    const card=document.createElement('div');
+    card.className='rc'+(r.status==='confirmed'?' confirmed':'');
+    card.innerHTML=`
+      <div class="rc__top">
+        <div><div class="rc__ref">${r.ref}${r.booth?' · ☕ Booth':''}</div><div class="rc__type">${r.type} — ${r.name}</div></div>
+        <span class="pill ${r.status}">${r.status}</span>
+      </div>
+      <div class="rc__row"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${r.date} at ${r.time}</div>
+      <div class="rc__row"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>${r.guests} guests</div>
+      <div class="rc__row"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2A19.79 19.79 0 0113 19"/></svg>${r.phone}</div>
+      ${r.status==='pending'?`<div class="rc__btns"><button class="rcb ok" data-ref="${r.ref}">✓ Confirm</button><button class="rcb no" data-ref="${r.ref}">✕ Decline</button></div>`:''}`;
+    card.querySelectorAll('.rcb.ok').forEach(b=>b.addEventListener('click',()=>{const e=RESERVATIONS.find(x=>x.ref===b.dataset.ref);if(e){e.status='confirmed';buildRes(rFil);toast(e.ref+' confirmed ✓');}}));
+    card.querySelectorAll('.rcb.no').forEach(b=>b.addEventListener('click',()=>{const i=RESERVATIONS.findIndex(x=>x.ref===b.dataset.ref);if(i>-1){RESERVATIONS.splice(i,1);buildRes(rFil);toast('Reservation declined');}}));
+    grid.appendChild(card);
+  });
+}
+document.querySelectorAll('[data-rf]').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('[data-rf]').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  rFil=b.dataset.rf;buildRes(rFil);
+}));
+
+/* ── MENU ── */
+let mFil='all';
+function buildMenu(f=mFil){
+  const grid=document.getElementById('mgrid');grid.innerHTML='';
+  MENU_ITEMS.filter(m=>f==='all'||m.cat===f).forEach(m=>{
+    const uid='sw'+m.name.replace(/\s/g,'');
+    const card=document.createElement('div');card.className='mc';
+    card.innerHTML=`
+      <img src="${m.img}" alt="${m.name}" loading="lazy"/>
+      <div class="mc__b">
+        <div class="mc__n">${m.name}</div>
+        <div class="mc__c">${m.cat}</div>
+        <div class="mc__r">
+          <span class="mc__p">₱${m.price}</span>
+          <label class="atog">
+            <span style="font-size:.66rem;color:${m.available?'var(--green)':'var(--red)'}" id="lbl-${uid}">${m.available?'Available':'Off Menu'}</span>
+            <label class="sw"><input type="checkbox" ${m.available?'checked':''} onchange="togItem('${m.name}','${uid}',this)"/><div class="sw-tr"></div></label>
+          </label>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+function togItem(name,uid,cb){
+  const e=MENU_ITEMS.find(m=>m.name===name);if(e)e.available=cb.checked;
+  const l=document.getElementById('lbl-'+uid);
+  if(l){l.textContent=cb.checked?'Available':'Off Menu';l.style.color=cb.checked?'var(--green)':'var(--red)';}
+  toast(name+' marked '+(cb.checked?'available':'off menu'));
+}
+document.querySelectorAll('[data-mf]').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('[data-mf]').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  mFil=b.dataset.mf;buildMenu(mFil);
+}));
+
+/* ── MESSAGES ── */
+function buildMsgs(){
+  const list=document.getElementById('mlist');list.innerHTML='';
+  MSGS.forEach(m=>{
+    const d=document.createElement('div');
+    d.className='msg'+(m.unread?' unread':'');
+    d.innerHTML=`<div class="msg__top"><div class="msg__from">${m.unread?'<div class="msg__dot"></div>':''}${m.from}</div><div class="msg__time">${m.time}</div></div><div class="msg__subj">${m.subj}</div><div class="msg__prev">${m.prev}</div>`;
+    d.addEventListener('click',()=>{m.unread=false;d.classList.remove('unread');updBadges();toast('Marked as read');});
+    list.appendChild(d);
+  });
+  updBadges();
+}
+
+/* ── BADGES ── */
+function updBadges(){
+  const pc=ORDERS.filter(o=>o.status==='pending').length;
+  const ob=document.getElementById('obdg');ob.textContent=pc;ob.style.display=pc?'':'none';
+  const uc=MSGS.filter(m=>m.unread).length;
+  const mb=document.getElementById('mbdg');mb.textContent=uc;mb.style.display=uc?'':'none';
+}
+
+/* ── MOBILE SIDEBAR ── */
+const mobSb=document.getElementById('mobSb'),sbEl=document.getElementById('sb'),sbOv=document.getElementById('sbOv');
+function openSb(){mobSb.classList.add('open');sbEl.classList.add('open');sbOv.classList.add('open');}
+function closeSb(){mobSb.classList.remove('open');sbEl.classList.remove('open');sbOv.classList.remove('open');}
+mobSb.addEventListener('click',()=>sbEl.classList.contains('open')?closeSb():openSb());
+sbOv.addEventListener('click',closeSb);
+
+/* ── TOAST ── */
+let tt;
+function toast(msg){
+  const el=document.getElementById('toast');
+  document.getElementById('toastTxt').textContent=msg;
+  el.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('on'),3000);
+}
+</script>
+</body>
+</html>

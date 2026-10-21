@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KoPito — Contact</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+
+  <style>
+  /* ═══════════════════════  TOKENS  ═══════════════════════ */
+  :root {
+    --espresso:#110700; --roast:#1e0d04; --mahogany:#5c2710; --caramel:#a0522d;
+    --crema:#e8d5b0; --foam:#f5ede0; --gold:#c9a84c; --gold-light:#e0c57a;
+    --surface:#1c0e06; --surface2:#231209; --border:rgba(201,168,76,.13);
+    --muted:rgba(232,213,176,.5); --radius-pill:9999px; --radius-lg:1.25rem;
+    --radius-md:.875rem; --ease-out:cubic-bezier(0.22,1,0.36,1);
+    --spring:cubic-bezier(0.34,1.56,0.64,1);
+    --nav-bg:rgba(20,8,2,.82); --nav-blur:blur(24px);
+  }
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'DM Sans',sans-serif;background:var(--espresso);color:var(--crema);min-height:100vh;overflow-x:hidden;}
+  body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:180px;opacity:.04;pointer-events:none;z-index:9998;}
+
+  /* ═══════════════════════  TOP BAR  ═══════════════════════ */
+  .top-bar{position:sticky;top:0;z-index:500;background:rgba(17,7,0,.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:.7rem 1.5rem;display:flex;align-items:center;gap:1rem;}
+  .top-bar__brand{font-family:'Cormorant Garamond',serif;font-size:1.45rem;font-weight:300;color:var(--foam);letter-spacing:.05em;text-decoration:none;flex-shrink:0;}
+  .top-bar__brand em{font-style:italic;color:var(--gold);}
+  .top-bar__spacer{flex:1;}
+
+  /* ═══════════════════════  PAGE HERO  ═══════════════════════ */
+  .page-hero{position:relative;overflow:hidden;padding:3.5rem 1.5rem 3rem;text-align:center;}
+  .page-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 90% 70% at 50% 0%,rgba(92,39,16,.5) 0%,transparent 65%),url('https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=1400&q=70&auto=format') center/cover no-repeat;opacity:.28;}
+  .page-hero::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(17,7,0,.35) 0%,var(--espresso) 100%);}
+  .page-hero__inner{position:relative;z-index:1;}
+  .page-hero__eyebrow{display:inline-flex;align-items:center;gap:.5rem;font-size:.68rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:.85rem;opacity:0;animation:fadeUp .8s var(--ease-out) .1s forwards;}
+  .page-hero__eyebrow::before,.page-hero__eyebrow::after{content:'';display:block;width:1.5rem;height:1px;background:var(--gold);opacity:.55;}
+  .page-hero h1{font-family:'DM Serif Display',serif;font-size:clamp(2.2rem,8vw,3.75rem);color:var(--foam);line-height:1.05;margin-bottom:.8rem;opacity:0;animation:fadeUp .9s var(--ease-out) .25s forwards;}
+  .page-hero h1 em{font-style:italic;color:var(--gold-light);}
+  .page-hero p{font-size:clamp(.85rem,2.5vw,.95rem);color:var(--muted);max-width:30rem;margin-inline:auto;line-height:1.75;font-weight:300;opacity:0;animation:fadeUp .9s var(--ease-out) .4s forwards;}
+
+  /* ═══════════════════════  SECTION UTILS  ═══════════════════════ */
+  .section-label{font-size:.63rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:.9rem;display:flex;align-items:center;gap:.65rem;}
+  .section-label::after{content:'';flex:1;height:1px;background:rgba(201,168,76,.18);}
+  .section-title{font-family:'DM Serif Display',serif;font-size:clamp(1.4rem,4vw,1.9rem);color:var(--foam);margin-bottom:.4rem;line-height:1.1;}
+  .section-title em{font-style:italic;color:var(--gold-light);}
+  .content-wrap{max-width:900px;margin-inline:auto;padding:2.5rem 1.5rem;}
+
+  /* Scroll-reveal */
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity .75s var(--ease-out),transform .75s var(--ease-out);}
+  .reveal.revealed{opacity:1;transform:none;}
+  .reveal-delay-1{transition-delay:.1s;} .reveal-delay-2{transition-delay:.2s;}
+  .reveal-delay-3{transition-delay:.32s;} .reveal-delay-4{transition-delay:.44s;}
+
+  /* ═══════════════════════  CONTACT GRID  ═══════════════════════ */
+  .contact-grid{display:grid;grid-template-columns:1fr;gap:2rem;}
+  @media(min-width:768px){.contact-grid{grid-template-columns:1fr 1.35fr;align-items:start;gap:3rem;}}
+
+  /* ── Info Cards ── */
+  .info-cards{display:flex;flex-direction:column;gap:.75rem;}
+  .info-card{display:flex;align-items:flex-start;gap:1rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.1rem 1.25rem;text-decoration:none;cursor:pointer;transition:transform .4s var(--spring),border-color .3s,background .3s,box-shadow .4s;}
+  .info-card:hover{transform:translateY(-4px);border-color:rgba(201,168,76,.35);background:rgba(28,14,6,.9);box-shadow:0 12px 36px rgba(0,0,0,.45);}
+  .info-card__icon{width:2.4rem;height:2.4rem;border-radius:.75rem;flex-shrink:0;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);display:flex;align-items:center;justify-content:center;transition:background .3s,transform .4s var(--spring);}
+  .info-card:hover .info-card__icon{background:rgba(201,168,76,.18);transform:scale(1.08) rotate(-4deg);}
+  .info-card__icon svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .info-card__label{font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:.2rem;}
+  .info-card__value{font-size:.88rem;color:var(--foam);font-weight:500;line-height:1.45;}
+  .info-card__sub{font-size:.75rem;color:var(--muted);margin-top:.1rem;}
+
+  /* "Tap to call" hint — mobile only */
+  .tap-hint{display:none;font-size:.68rem;color:rgba(74,222,128,.7);margin-top:.2rem;letter-spacing:.06em;}
+  @media(max-width:767px){.tap-hint{display:block;}}
+
+  /* Hours pills */
+  .hours-row{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:1rem;}
+  .hours-pill{display:flex;align-items:center;gap:.4rem;padding:.3rem .85rem;border-radius:var(--radius-pill);background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.18);font-size:.73rem;color:var(--crema);}
+  .hours-pill::before{content:'';width:6px;height:6px;border-radius:50%;background:#4ade80;box-shadow:0 0 5px rgba(74,222,128,.7);flex-shrink:0;}
+
+  /* ── Message Form ── */
+  .form-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.75rem 1.5rem;}
+  .field{display:flex;flex-direction:column;gap:.45rem;margin-bottom:1rem;}
+  .field__label{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:600;}
+  .field__input-wrap{position:relative;}
+  .field input,.field textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-md);padding:.82rem 1rem .82rem 2.8rem;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--foam);outline:none;transition:border-color .3s,background .3s,box-shadow .3s;-webkit-appearance:none;appearance:none;}
+  .field textarea{padding-left:1rem;min-height:130px;resize:vertical;line-height:1.65;}
+  .field input::placeholder,.field textarea::placeholder{color:var(--muted);}
+  .field input:focus,.field textarea:focus{border-color:rgba(201,168,76,.5);background:rgba(28,14,6,.85);box-shadow:0 0 0 3px rgba(201,168,76,.09);}
+  .field__icon{position:absolute;left:.9rem;top:50%;transform:translateY(-50%);width:15px;height:15px;stroke:var(--gold);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;pointer-events:none;opacity:.75;}
+  .field.valid input{border-color:rgba(74,222,128,.4);}
+  .field.invalid input,.field.invalid textarea{border-color:rgba(226,58,45,.4);}
+  .field__error{font-size:.7rem;color:#e23a2d;display:none;margin-top:.1rem;}
+  .field.invalid .field__error{display:block;}
+  .form-row-two{display:grid;grid-template-columns:1fr;}
+  @media(min-width:480px){.form-row-two{grid-template-columns:1fr 1fr;gap:0 1rem;}}
+  .field__counter{text-align:right;font-size:.68rem;color:var(--muted);margin-top:.2rem;}
+  .send-btn{width:100%;padding:.9rem;border-radius:var(--radius-pill);border:none;background:linear-gradient(135deg,var(--caramel),var(--mahogany));color:var(--foam);font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:600;letter-spacing:.03em;cursor:pointer;box-shadow:0 4px 22px rgba(92,39,16,.5);display:flex;align-items:center;justify-content:center;gap:.55rem;transition:transform .35s var(--spring),box-shadow .3s,opacity .3s;margin-top:.5rem;}
+  .send-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(92,39,16,.7);}
+  .send-btn:active{transform:scale(.97);}
+  .send-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+  .send-btn.sent{background:rgba(74,222,128,.2);box-shadow:none;border:1px solid rgba(74,222,128,.35);color:#4ade80;}
+  .send-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* ── Prefill hint chip (appears when email card is clicked) ── */
+  .prefill-hint{
+    display:none;align-items:center;gap:.4rem;
+    padding:.35rem .85rem;border-radius:var(--radius-pill);
+    background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);
+    font-size:.72rem;color:var(--gold-light);margin-bottom:.85rem;
+  }
+  .prefill-hint.show{display:flex;}
+  .prefill-hint svg{width:12px;height:12px;stroke:var(--gold);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+
+  /* ═══════════════════════  DIVIDER  ═══════════════════════ */
+  .section-divider{width:100%;height:1px;background:linear-gradient(to right,transparent,rgba(201,168,76,.2),transparent);}
+
+  /* ═══════════════════════  SOCIAL SECTION  ═══════════════════════ */
+  .social-section{padding:2.5rem 1.5rem;}
+  .social-inner{max-width:900px;margin-inline:auto;}
+  .social-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;margin-top:1.5rem;}
+  @media(min-width:640px){.social-grid{grid-template-columns:repeat(4,1fr);}}
+
+  .social-card{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;gap:.75rem;padding:1.5rem 1rem;border-radius:var(--radius-lg);border:1px solid var(--border);background:var(--surface);text-decoration:none;cursor:pointer;transition:transform .45s var(--spring),border-color .3s,box-shadow .4s;-webkit-tap-highlight-color:transparent;}
+  .social-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .4s ease;border-radius:inherit;}
+  .social-card:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 18px 44px rgba(0,0,0,.45);}
+  .social-card:hover::before{opacity:1;}
+  .social-card--fb::before{background:linear-gradient(135deg,rgba(24,119,242,.18),transparent 70%);}
+  .social-card--ig::before{background:linear-gradient(135deg,rgba(225,48,108,.15),rgba(253,121,36,.12),transparent 70%);}
+  .social-card--tt::before{background:linear-gradient(135deg,rgba(105,201,208,.12),rgba(255,37,79,.12),transparent 70%);}
+  .social-card--tw::before{background:linear-gradient(135deg,rgba(29,155,240,.18),transparent 70%);}
+  .social-card:hover.social-card--fb{border-color:rgba(24,119,242,.4);}
+  .social-card:hover.social-card--ig{border-color:rgba(225,48,108,.35);}
+  .social-card:hover.social-card--tt{border-color:rgba(105,201,208,.35);}
+  .social-card:hover.social-card--tw{border-color:rgba(29,155,240,.4);}
+  .social-card__icon{width:3rem;height:3rem;border-radius:1rem;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.08);transition:transform .45s var(--spring),box-shadow .3s;position:relative;z-index:1;}
+  .social-card:hover .social-card__icon{transform:scale(1.12) rotate(-5deg);}
+  .social-card__icon svg{width:22px;height:22px;display:block;}
+  .social-card--fb .social-card__icon{background:rgba(24,119,242,.15);}
+  .social-card--ig .social-card__icon{background:linear-gradient(135deg,rgba(225,48,108,.15),rgba(253,121,36,.12));}
+  .social-card--tt .social-card__icon{background:rgba(0,0,0,.3);border-color:rgba(255,255,255,.1);}
+  .social-card--tw .social-card__icon{background:rgba(29,155,240,.12);}
+  .social-card__name{font-size:.82rem;font-weight:600;color:var(--foam);letter-spacing:.04em;position:relative;z-index:1;}
+  .social-card__handle{font-size:.72rem;color:var(--muted);position:relative;z-index:1;margin-top:-.3rem;}
+  .social-card__arrow{position:absolute;bottom:.75rem;right:.85rem;opacity:0;transform:translate(-4px,4px);transition:opacity .3s,transform .4s var(--ease-out);}
+  .social-card:hover .social-card__arrow{opacity:.5;transform:none;}
+  .social-card__arrow svg{width:12px;height:12px;stroke:var(--gold);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* ═══════════════════════  CTA BANNER  ═══════════════════════ */
+  .cta-banner{position:relative;overflow:hidden;border-radius:var(--radius-lg);border:1px solid rgba(201,168,76,.22);background:linear-gradient(135deg,var(--surface2) 0%,var(--roast) 100%);padding:2.25rem 2rem;display:flex;flex-direction:column;align-items:center;text-align:center;gap:1.25rem;box-shadow:0 12px 48px rgba(0,0,0,.4);}
+  .cta-banner::before{content:'';position:absolute;right:-3rem;top:-3rem;width:14rem;height:14rem;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.12) 0%,transparent 70%);pointer-events:none;}
+  .cta-banner__eyebrow{font-size:.63rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:.5rem;position:relative;z-index:1;}
+  .cta-banner__eyebrow::before,.cta-banner__eyebrow::after{content:'';width:1.25rem;height:1px;background:var(--gold);opacity:.5;}
+  .cta-banner h2{font-family:'DM Serif Display',serif;font-size:clamp(1.5rem,5vw,2.2rem);color:var(--foam);line-height:1.1;position:relative;z-index:1;}
+  .cta-banner h2 em{font-style:italic;color:var(--gold-light);}
+  .cta-banner p{font-size:.88rem;color:var(--muted);max-width:28rem;line-height:1.7;position:relative;z-index:1;font-weight:300;}
+  .cta-banner__actions{display:flex;flex-wrap:wrap;gap:.75rem;justify-content:center;position:relative;z-index:1;}
+  .btn-primary{display:inline-flex;align-items:center;gap:.5rem;padding:.85rem 2rem;border-radius:var(--radius-pill);border:none;background:linear-gradient(135deg,var(--caramel),var(--mahogany));color:var(--foam);font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:600;letter-spacing:.03em;cursor:pointer;text-decoration:none;box-shadow:0 4px 22px rgba(92,39,16,.5);transition:transform .35s var(--spring),box-shadow .3s;}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(92,39,16,.7);}
+  .btn-ghost{display:inline-flex;align-items:center;gap:.5rem;padding:.85rem 1.75rem;border-radius:var(--radius-pill);background:rgba(255,255,255,.05);border:1px solid rgba(201,168,76,.25);color:var(--crema);font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:500;text-decoration:none;cursor:pointer;transition:background .3s,border-color .3s,transform .35s var(--spring);}
+  .btn-ghost:hover{background:rgba(201,168,76,.1);border-color:rgba(201,168,76,.45);transform:translateY(-1px);}
+  .btn-primary svg,.btn-ghost svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* ═══════════════════════  MAP  ═══════════════════════ */
+  .map-section{padding:2.5rem 1.5rem 8rem;}
+  .map-inner{max-width:900px;margin-inline:auto;}
+  .map-card{border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden;box-shadow:0 16px 50px rgba(0,0,0,.5);position:relative;outline:1px solid rgba(201,168,76,.06);outline-offset:3px;}
+  .map-card__header{background:var(--surface);border-bottom:1px solid var(--border);padding:.85rem 1.2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;}
+  .map-card__header-left{display:flex;align-items:center;gap:.7rem;}
+  .map-card__pin{width:2rem;height:2rem;border-radius:.625rem;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .map-card__pin svg{width:14px;height:14px;stroke:var(--gold);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .map-card__address{font-size:.83rem;font-weight:500;color:var(--foam);}
+  .map-card__city{font-size:.72rem;color:var(--muted);}
+  .map-card__open-link{display:inline-flex;align-items:center;gap:.35rem;padding:.35rem .85rem;border-radius:var(--radius-pill);background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.22);font-size:.72rem;font-weight:600;color:var(--gold-light);text-decoration:none;white-space:nowrap;transition:background .3s,border-color .3s;}
+  .map-card__open-link:hover{background:rgba(201,168,76,.18);border-color:rgba(201,168,76,.45);}
+  .map-card__open-link svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+  .map-card__iframe-wrap{position:relative;width:100%;aspect-ratio:16/8;background:var(--roast);}
+  @media(max-width:600px){.map-card__iframe-wrap{aspect-ratio:4/3;}}
+  .map-card__iframe-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:none;display:block;filter:saturate(.6) brightness(.75) sepia(.25);transition:filter .4s ease;}
+  .map-card__iframe-wrap:hover iframe{filter:saturate(.85) brightness(.85) sepia(.1);}
+  .map-card__iframe-wrap::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,var(--roast) 25%,rgba(46,18,8,.6) 50%,var(--roast) 75%);background-size:200% 100%;animation:shimmer 1.8s infinite;pointer-events:none;opacity:1;transition:opacity .6s;}
+  .map-loaded .map-card__iframe-wrap::before{opacity:0;pointer-events:none;}
+  @keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+
+  /* ═══════════════════════  TOAST  ═══════════════════════ */
+  .toast{position:fixed;top:1.25rem;left:50%;transform:translateX(-50%) translateY(-90px);z-index:9500;background:var(--surface);border:1px solid rgba(201,168,76,.3);border-radius:var(--radius-pill);padding:.65rem 1.5rem;display:flex;align-items:center;gap:.55rem;box-shadow:0 8px 32px rgba(0,0,0,.55);font-size:.85rem;font-weight:500;color:var(--foam);white-space:nowrap;transition:transform .5s var(--ease-out),opacity .5s;opacity:0;}
+  .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+  .toast--success svg{stroke:#4ade80;} .toast--error svg{stroke:#e23a2d;}
+  .toast svg{width:15px;height:15px;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+
+  /* ═══════════════════════  KEYFRAMES  ═══════════════════════ */
+  @keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:none;}}
+  ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:rgba(201,168,76,.2);border-radius:2px;}
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;}}
+  
+    /* ===== DYNAMIC ISLAND NAV ===== */
+    .nav-island {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 1.5rem;
+      transform: none;
+      z-index: 10000;
+      background: var(--nav-bg);
+      backdrop-filter: var(--nav-blur);
+      -webkit-backdrop-filter: var(--nav-blur);
+      border: 1px solid rgba(201, 168, 76, 0.18);
+      border-radius: var(--radius-pill);
+      box-shadow:
+        0 8px 40px rgba(0,0,0,0.7),
+        0 1px 0 rgba(201,168,76,0.08) inset,
+        0 -1px 0 rgba(0,0,0,0.3) inset;
+      transition:
+        width 0.55s var(--transition),
+        padding 0.4s var(--ease-out),
+        border-radius 0.55s var(--transition),
+        box-shadow 0.4s ease;
+      width: min(340px, 90vw);
+      padding: 0.45rem 0.6rem;
+    }
+    .nav-island:hover,
+    .nav-island.expanded {
+      width: min(420px, 92vw);
+      box-shadow:
+        0 16px 60px rgba(0,0,0,0.8),
+        0 1px 0 rgba(201,168,76,0.15) inset,
+        0 -1px 0 rgba(0,0,0,0.3) inset;
+    }
+    .nav-island__inner {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.2rem;
+      min-width: 0;
+    }
+    .nav-item {
+      display: flex;
+      flex: 1 1 0;
+      min-width: 0;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.2rem;
+      padding: 0.45rem 0.65rem;
+      border-radius: var(--radius-pill);
+      text-decoration: none;
+      color: rgba(232, 213, 176, 0.55);
+      cursor: pointer;
+      transition: color 0.3s ease, background 0.3s ease, transform 0.4s var(--transition);
+      -webkit-tap-highlight-color: transparent;
+      position: relative;
+    }
+    .nav-item:hover,
+    .nav-item.active { color: var(--foam); transform: translateY(-1px); }
+    .nav-item.active  { background: rgba(201, 168, 76, 0.12); }
+    .nav-item__icon   { position: relative; width: 22px; height: 22px; }
+    .nav-item__icon svg {
+      width: 20px; height: 20px;
+      stroke: currentColor; fill: none;
+      stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+      transition: transform 0.4s var(--transition);
+    }
+    .nav-item:hover .nav-item__icon svg,
+    .nav-item.active .nav-item__icon svg { transform: scale(1.18); }
+    .nav-item.active::after {
+      content: '';
+      position: absolute; bottom: 3px; left: 50%;
+      transform: translateX(-50%);
+      width: 3.5px; height: 3.5px;
+      background: var(--gold); border-radius: 50%;
+      animation: dotPop 0.4s var(--transition) forwards;
+    }
+    @keyframes dotPop {
+      0%   { transform: translateX(-50%) scale(0); }
+      100% { transform: translateX(-50%) scale(1); }
+    }
+    .nav-item__label {
+      font-size: 0.6rem; font-weight: 500;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      white-space: nowrap; opacity: 0; max-width: 0; overflow: hidden;
+      transition: opacity 0.3s ease, max-width 0.5s var(--ease-out);
+    }
+    @media (min-width: 480px) {
+      .nav-item__label { opacity: 1; max-width: 60px; }
+      .nav-island { padding: 0.5rem 0.75rem; }
+    }
+    .nav-item.active .nav-item__label { opacity: 1; max-width: 60px; color: var(--gold-light); }
+    .nav-sep { width: 1px; height: 20px; background: rgba(201,168,76,0.15); flex-shrink: 0; }
+    .nav-toggle {
+      display: none;
+      align-items: center; justify-content: center;
+      border: 0; background: transparent;
+      color: var(--crema); cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-toggle svg {
+      width: 1.35rem; height: 1.35rem;
+      stroke: currentColor; fill: none;
+      stroke-width: 2; stroke-linecap: round;
+    }
+    @media (max-width: 639px) {
+      .nav-island {
+        left: auto;
+        right: max(1rem, env(safe-area-inset-right));
+        bottom: max(1rem, env(safe-area-inset-bottom));
+        width: auto; padding: 0;
+        border: 0; background: transparent;
+        box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none;
+      }
+      .nav-island:hover,
+      .nav-island.expanded { width: auto; box-shadow: none; }
+      .nav-toggle {
+        display: flex;
+        width: 3.25rem; height: 3.25rem; border-radius: 50%;
+        background: var(--nav-bg);
+        border: 1px solid rgba(201,168,76,0.22);
+        color: var(--gold-light);
+        box-shadow: 0 10px 36px rgba(0,0,0,0.62), 0 1px 0 rgba(201,168,76,0.12) inset;
+        backdrop-filter: var(--nav-blur); -webkit-backdrop-filter: var(--nav-blur);
+      }
+      .nav-island__inner {
+        position: absolute;
+        right: 0; bottom: calc(100% + 0.75rem);
+        width: min(14rem, calc(100vw - 2rem));
+        padding: 0.6rem;
+        flex-direction: column; align-items: stretch;
+        flex-wrap: nowrap; gap: 0.25rem;
+        background: var(--nav-bg);
+        border: 1px solid rgba(201,168,76,0.2);
+        border-radius: var(--radius-lg);
+        box-shadow: 0 18px 55px rgba(0,0,0,0.72);
+        backdrop-filter: var(--nav-blur); -webkit-backdrop-filter: var(--nav-blur);
+        opacity: 0; pointer-events: none;
+        transform: translateY(0.6rem) scale(0.96);
+        transform-origin: bottom right;
+        transition: opacity 0.25s ease, transform 0.3s var(--ease-out);
+      }
+      .nav-island.expanded .nav-island__inner {
+        opacity: 1; pointer-events: auto; transform: none;
+      }
+      .nav-item {
+        flex: none; flex-direction: row;
+        justify-content: flex-start;
+        gap: 0.7rem; padding: 0.72rem 0.85rem;
+      }
+      .nav-item__icon { width: 20px; height: 20px; flex-shrink: 0; }
+      .nav-item__label { opacity: 1; max-width: none; font-size: 0.72rem; }
+      .nav-item.active::after {
+        left: auto; right: 0.85rem;
+        top: 50%; bottom: auto;
+        transform: translateY(-50%);
+        width: 5px; height: 5px; animation: none;
+      }
+      .nav-sep { display: none; }
+    }
+    @media (min-width: 768px)  { .nav-island { bottom: 2rem; } }
+    @media (min-width: 1024px) { .nav-item { padding: 0.6rem 1.1rem; } }
+
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR — title removed -->
+<header class="top-bar">
+  <a href="Home.html" class="top-bar__brand">Ko<em>Pito</em></a>
+  <span class="top-bar__spacer"></span>
+</header>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="page-hero__inner">
+    <div class="page-hero__eyebrow">Get in Touch</div>
+    <h1>We'd Love to <em>Hear</em> From You</h1>
+    <p>Whether you have a question about our menu, want to reserve a table, or need to hire our coffee booth — we're always happy to talk.</p>
+  </div>
+</section>
+
+<!-- ═══════════════  SECTION 1: INFO + FORM  ═══════════════ -->
+<section>
+  <div class="content-wrap">
+    <div class="section-label reveal">Contact &amp; Message</div>
+    <div class="contact-grid">
+
+      <!-- Info Cards -->
+      <div class="info-cards" role="list">
+
+        <!-- PHONE — tel: link so mobile opens dialer -->
+        <a href="tel:+442071234567" class="info-card reveal reveal-delay-1" role="listitem" aria-label="Call us">
+          <div class="info-card__icon">
+            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.06 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+          </div>
+          <div class="info-card__body">
+            <div class="info-card__label">Phone</div>
+            <div class="info-card__value">+44 (0)20 7123 4567</div>
+            <div class="info-card__sub">Mon–Sun, 7:00 AM – 10:00 PM</div>
+            <!-- shows only on mobile -->
+            <div class="tap-hint">📞 Tap to call</div>
+          </div>
+        </a>
+
+        <!-- EMAIL — scrolls to form, no mailto -->
+        <div class="info-card reveal reveal-delay-2" id="emailCard" role="listitem" style="cursor:pointer;" aria-label="Send us a message">
+          <div class="info-card__icon">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div class="info-card__body">
+            <div class="info-card__label">Email</div>
+            <div class="info-card__value">hello@kopito.coffee</div>
+            <div class="info-card__sub">Click to send us a message ↓</div>
+          </div>
+        </div>
+
+        <!-- ADDRESS -->
+        <a href="https://www.google.com/maps/search/?api=1&query=KoPito%2014.2873922%2C121.001788" target="_blank" rel="noopener" class="info-card reveal reveal-delay-3" role="listitem" aria-label="Get directions">
+          <div class="info-card__icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+          </div>
+          <div class="info-card__body">
+            <div class="info-card__label">Address</div>
+            <div class="info-card__value">KoPito</div>
+            <div class="info-card__sub">Cavite, Philippines</div>
+          </div>
+        </a>
+
+        <!-- HOURS -->
+        <div class="info-card reveal reveal-delay-4" role="listitem">
+          <div class="info-card__icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="info-card__body" style="width:100%">
+            <div class="info-card__label">Opening Hours</div>
+            <div class="hours-row">
+              <span class="hours-pill">Mon – Fri: 7AM – 9PM</span>
+              <span class="hours-pill">Sat – Sun: 8AM – 10PM</span>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /info-cards -->
+
+      <!-- MESSAGE FORM -->
+      <div class="form-card reveal reveal-delay-2" id="messageFormSection">
+        <div class="section-label" style="margin-bottom:.5rem">Send a Message</div>
+
+        <!-- Prefill hint shown when email card is clicked -->
+        <div class="prefill-hint" id="prefillHint">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          Subject pre-filled from your email click
+        </div>
+
+        <form id="contactForm" novalidate>
+          <div class="form-row-two">
+            <div class="field" id="fieldName">
+              <label class="field__label" for="cName">Your Name</label>
+              <div class="field__input-wrap">
+                <svg class="field__icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <input type="text" id="cName" name="name" placeholder="Maria Santos" required autocomplete="name"/>
+              </div>
+              <span class="field__error">Please enter your name.</span>
+            </div>
+            <div class="field" id="fieldEmail">
+              <label class="field__label" for="cEmail">Email Address</label>
+              <div class="field__input-wrap">
+                <svg class="field__icon" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <input type="email" id="cEmail" name="email" placeholder="your@email.com" required autocomplete="email"/>
+              </div>
+              <span class="field__error">Enter a valid email address.</span>
+            </div>
+          </div>
+
+          <div class="field" id="fieldSubject">
+            <label class="field__label" for="cSubject">Subject</label>
+            <div class="field__input-wrap">
+              <svg class="field__icon" viewBox="0 0 24 24"><line x1="21" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="11" y2="18"/></svg>
+              <input type="text" id="cSubject" name="subject" placeholder="How can we help?" required/>
+            </div>
+            <span class="field__error">Please add a subject.</span>
+          </div>
+
+          <div class="field" id="fieldMsg">
+            <label class="field__label" for="cMsg">Message</label>
+            <textarea id="cMsg" name="message" placeholder="Tell us more — we're all ears…" required maxlength="500"></textarea>
+            <div class="field__counter"><span id="charCount">0</span> / 500</div>
+            <span class="field__error">Please write a message (at least 10 characters).</span>
+          </div>
+
+          <button type="submit" class="send-btn" id="sendBtn">
+            <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Send Message
+          </button>
+        </form>
+      </div><!-- /form-card -->
+
+    </div><!-- /contact-grid -->
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════  SECTION 2: SOCIAL MEDIA  ═══════════════ -->
+<section class="social-section">
+  <div class="social-inner">
+    <div class="section-label reveal">Follow Along</div>
+    <div class="section-title reveal reveal-delay-1">Find Us on <em>Social</em></div>
+    <p style="font-size:.88rem;color:var(--muted);margin-top:.4rem;font-weight:300;max-width:30rem;" class="reveal reveal-delay-2">Daily brews, behind-the-scenes moments, and exclusive offers.</p>
+
+    <div class="social-grid">
+
+      <!-- Facebook — links to actual KoPito page -->
+      <a href="https://www.facebook.com/Kopito777" target="_blank" rel="noopener" class="social-card social-card--fb reveal reveal-delay-1" aria-label="Follow KoPito on Facebook">
+        <div class="social-card__icon">
+          <svg viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073C24 5.41 18.627 0 12 0S0 5.41 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.93-1.956 1.886v2.286h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
+        </div>
+        <div class="social-card__name">Facebook</div>
+        <div class="social-card__handle">@Kopito777</div>
+        <div class="social-card__arrow"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
+      </a>
+
+      <!-- Instagram -->
+      <a href="https://instagram.com" target="_blank" rel="noopener" class="social-card social-card--ig reveal reveal-delay-2" aria-label="Follow KoPito on Instagram">
+        <div class="social-card__icon">
+          <svg viewBox="0 0 24 24" fill="none">
+            <defs>
+              <linearGradient id="ig" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#f09433"/><stop offset="25%" stop-color="#e6683c"/>
+                <stop offset="50%" stop-color="#dc2743"/><stop offset="75%" stop-color="#cc2366"/>
+                <stop offset="100%" stop-color="#bc1888"/>
+              </linearGradient>
+            </defs>
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="url(#ig)"/>
+            <circle cx="12" cy="12" r="4.5" stroke="white" stroke-width="1.8" fill="none"/>
+            <circle cx="17.5" cy="6.5" r="1.2" fill="white"/>
+          </svg>
+        </div>
+        <div class="social-card__name">Instagram</div>
+        <div class="social-card__handle">@kopito.coffee</div>
+        <div class="social-card__arrow"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
+      </a>
+
+      <!-- TikTok -->
+      <a href="https://tiktok.com" target="_blank" rel="noopener" class="social-card social-card--tt reveal reveal-delay-3" aria-label="Follow KoPito on TikTok">
+        <div class="social-card__icon">
+          <svg viewBox="0 0 24 24" fill="white"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34v-7a8.16 8.16 0 004.77 1.52V6.38a4.85 4.85 0 01-1-.31z"/></svg>
+        </div>
+        <div class="social-card__name">TikTok</div>
+        <div class="social-card__handle">@kopito.coffee</div>
+        <div class="social-card__arrow"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
+      </a>
+
+      <!-- Twitter / X -->
+      <a href="https://twitter.com" target="_blank" rel="noopener" class="social-card social-card--tw reveal reveal-delay-4" aria-label="Follow KoPito on Twitter">
+        <div class="social-card__icon">
+          <svg viewBox="0 0 24 24" fill="#1D9BF0"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.259 5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </div>
+        <div class="social-card__name">Twitter / X</div>
+        <div class="social-card__handle">@kopitocoffee</div>
+        <div class="social-card__arrow"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════  SECTION 3: CTA  ═══════════════ -->
+<section style="padding:2.5rem 1.5rem;">
+  <div style="max-width:900px;margin-inline:auto;">
+    <div class="cta-banner reveal">
+      <div class="cta-banner__eyebrow">Private Events &amp; Booth Hire</div>
+      <h2>Ready to <em>Reserve</em> Your Moment?</h2>
+      <p>Book the café for a private celebration, or bring the KoPito Coffee Booth to your event anywhere across Luzon. We handle everything — you just enjoy the coffee.</p>
+      <div class="cta-banner__actions">
+        <a href="Reservation.html" class="btn-primary">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Book a Table
+        </a>
+        <a href="Menu.HTML" class="btn-ghost">
+          <svg viewBox="0 0 24 24"><path d="M17 8h1a4 4 0 010 8h-1"/><path d="M3 8h14v9a4 4 0 01-4 4H7a4 4 0 01-4-4V8z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>
+          View Menu
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ═══════════════  SECTION 4: MAP  ═══════════════ -->
+<section class="map-section">
+  <div class="map-inner">
+    <div class="section-label reveal">Find Us</div>
+    <div class="section-title reveal reveal-delay-1">We're on the <em>Map</em></div>
+    <p style="font-size:.88rem;color:var(--muted);margin-top:.35rem;margin-bottom:1.5rem;font-weight:300;" class="reveal reveal-delay-2">Walk in any time during opening hours — no appointment needed for a great cup of coffee.</p>
+    <div class="map-card reveal reveal-delay-2" id="mapCard">
+      <div class="map-card__header">
+        <div class="map-card__header-left">
+          <div class="map-card__pin">
+            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+          </div>
+          <div>
+            <div class="map-card__address">KoPito</div>
+            <div class="map-card__city">Cavite, Philippines</div>
+          </div>
+        </div>
+        <a href="https://www.google.com/maps/search/?api=1&query=KoPito%2014.2873922%2C121.001788" target="_blank" rel="noopener" class="map-card__open-link">
+          <svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+          Open in Maps
+        </a>
+      </div>
+      <div class="map-card__iframe-wrap">
+        <iframe id="mapIframe"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1699.1074850337527!2d121.00178799999999!3d14.287392200000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397d73621fcb7b7%3A0xc66eebac9d2e5063!2sKoPito!5e1!3m2!1sen!2sph!4v1779127010780!5m2!1sen!2sph"
+          allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          title="KoPito location map" aria-label="Google Maps showing KoPito Coffee location">
+        </iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TOAST -->
+<div class="toast toast--success" id="toast" role="alert" aria-live="polite">
+  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="toastMsg">Message sent!</span>
+</div>
+
+
+
+<!-- ISLAND NAV -->
+  <nav class="nav-island" id="navIsland" role="navigation" aria-label="Main navigation">
+    <button class="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="navMenu">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+    </button>
+    <div class="nav-island__inner" id="navMenu">
+      <a href="Home.html" class="nav-item" aria-label="Home">
+        <span class="nav-item__icon"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V21a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+        <span class="nav-item__label">Home</span>
+      </a>
+      <div class="nav-sep" aria-hidden="true"></div>
+      <a href="Menu.HTML" class="nav-item" aria-label="Menu">
+        <span class="nav-item__icon"><svg viewBox="0 0 24 24"><path d="M17 8h1a4 4 0 010 8h-1"/><path d="M3 8h14v9a4 4 0 01-4 4H7a4 4 0 01-4-4V8z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg></span>
+        <span class="nav-item__label">Menu</span>
+      </a>
+      <div class="nav-sep" aria-hidden="true"></div>
+      <a href="About.html" class="nav-item" aria-label="About">
+        <span class="nav-item__icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
+        <span class="nav-item__label">About</span>
+      </a>
+      <div class="nav-sep" aria-hidden="true"></div>
+      <a href="Contact.HTML" class="nav-item active" aria-label="Contact" aria-current="page">
+        <span class="nav-item__icon"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.06 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></span>
+        <span class="nav-item__label">Contact</span>
+      </a>
+      <div class="nav-sep" aria-hidden="true"></div>
+      <a href="Account.html" class="nav-item" aria-label="Account">
+        <span class="nav-item__icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+        <span class="nav-item__label">Account</span>
+      </a>
+    </div>
+  </nav>
+
+<script>
+/* ══════════  SCROLL REVEAL  ══════════ */
+const ro = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting){e.target.classList.add('revealed');ro.unobserve(e.target);} });
+},{threshold:.12,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+
+/* ══════════  EMAIL CARD → SCROLL TO FORM  ══════════
+   No mailto — clicking the email info card smoothly
+   scrolls down to the Send a Message form and focuses
+   the subject field with a helpful pre-fill.           */
+document.getElementById('emailCard').addEventListener('click', () => {
+  const formSection = document.getElementById('messageFormSection');
+  const subjectInput = document.getElementById('cSubject');
+  // Smooth scroll to form
+  formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // Small delay so scroll completes before focus
+  setTimeout(() => {
+    if (!subjectInput.value.trim()) {
+      subjectInput.value = 'General Enquiry';
+      subjectInput.select();
+      // Trigger valid state
+      document.getElementById('fieldSubject').classList.add('valid');
+      document.getElementById('fieldSubject').classList.remove('invalid');
+    }
+    subjectInput.focus();
+    // Show the prefill hint chip
+    document.getElementById('prefillHint').classList.add('show');
+  }, 520);
+});
+
+/* ══════════  CHAR COUNTER  ══════════ */
+const msgArea   = document.getElementById('cMsg');
+const charCount = document.getElementById('charCount');
+msgArea.addEventListener('input', () => {
+  const len = msgArea.value.length;
+  charCount.textContent = len;
+  charCount.style.color = len > 490 ? '#e23a2d' : len > 450 ? '#f59e0b' : '';
+});
+
+/* ══════════  LIVE VALIDATION  ══════════ */
+function validateField(inputEl, wrapId, testFn) {
+  const wrap = document.getElementById(wrapId);
+  inputEl.addEventListener('blur', () => {
+    const ok = testFn(inputEl.value);
+    wrap.classList.toggle('invalid', !ok);
+    wrap.classList.toggle('valid', ok);
+  });
+  inputEl.addEventListener('input', () => {
+    if (wrap.classList.contains('invalid') && testFn(inputEl.value)) {
+      wrap.classList.remove('invalid'); wrap.classList.add('valid');
+    }
+  });
+}
+validateField(document.getElementById('cName'),    'fieldName',    v => v.trim().length >= 2);
+validateField(document.getElementById('cEmail'),   'fieldEmail',   v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v));
+validateField(document.getElementById('cSubject'), 'fieldSubject', v => v.trim().length >= 3);
+validateField(document.getElementById('cMsg'),     'fieldMsg',     v => v.trim().length >= 10);
+
+/* ══════════  FORM SUBMIT  ══════════ */
+document.getElementById('contactForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const fields = [
+    { el: document.getElementById('cName'),    id:'fieldName',    test: v => v.trim().length >= 2 },
+    { el: document.getElementById('cEmail'),   id:'fieldEmail',   test: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) },
+    { el: document.getElementById('cSubject'), id:'fieldSubject', test: v => v.trim().length >= 3 },
+    { el: document.getElementById('cMsg'),     id:'fieldMsg',     test: v => v.trim().length >= 10 },
+  ];
+  let allValid = true;
+  fields.forEach(f => {
+    const wrap = document.getElementById(f.id);
+    const ok = f.test(f.el.value);
+    wrap.classList.toggle('invalid', !ok); wrap.classList.toggle('valid', ok);
+    if (!ok) allValid = false;
+  });
+  if (!allValid) { showToast('Please fill in all required fields.', 'error'); return; }
+
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = true;
+  btn.innerHTML = `<svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round"><polyline points="20 6 9 17 4 12"/></svg> Sending…`;
+
+  setTimeout(() => {
+    btn.classList.add('sent');
+    btn.innerHTML = `<svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:#4ade80;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round"><polyline points="20 6 9 17 4 12"/></svg> Message Sent!`;
+    document.getElementById('contactForm').reset();
+    charCount.textContent = '0';
+    document.getElementById('prefillHint').classList.remove('show');
+    fields.forEach(f => { document.getElementById(f.id).classList.remove('valid','invalid'); });
+    showToast("Your message has been sent! We'll reply within 24 hours ☕", 'success');
+    setTimeout(() => {
+      btn.disabled = false; btn.classList.remove('sent');
+      btn.innerHTML = `<svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send Message`;
+    }, 4000);
+  }, 1200);
+});
+
+/* ══════════  TOAST  ══════════ */
+let toastTimer;
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.className = `toast toast--${type} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 4200);
+}
+
+/* ══════════  MAP SHIMMER  ══════════ */
+document.getElementById('mapIframe').addEventListener('load', () => {
+  document.getElementById('mapCard').classList.add('map-loaded');
+});
+
+/* ── Dynamic Island Nav ── */
+(function(){
+  const island = document.querySelector('.nav-island');
+  if(!island) return;
+  const navToggle = island.querySelector('.nav-toggle');
+  let collapseTimer;
+  function setNavExpanded(v){
+    island.classList.toggle('expanded',v);
+    if(navToggle) navToggle.setAttribute('aria-expanded',String(v));
+  }
+  island.addEventListener('mouseenter',()=>{ clearTimeout(collapseTimer); setNavExpanded(true); });
+  island.addEventListener('mouseleave',()=>{ collapseTimer=setTimeout(()=>setNavExpanded(false),600); });
+  island.addEventListener('touchstart',()=>{ clearTimeout(collapseTimer); setNavExpanded(true); collapseTimer=setTimeout(()=>setNavExpanded(false),3000); },{passive:true});
+  if(navToggle){
+    navToggle.addEventListener('touchstart',(e)=>e.stopPropagation(),{passive:true});
+    navToggle.addEventListener('click',(e)=>{ e.stopPropagation(); clearTimeout(collapseTimer); setNavExpanded(!island.classList.contains('expanded')); });
+  }
+  document.addEventListener('click',(e)=>{ if(window.matchMedia('(max-width:639px)').matches && !island.contains(e.target)) setNavExpanded(false); });
+  document.addEventListener('keydown',(e)=>{ if(e.key==='Escape') setNavExpanded(false); });
+  island.querySelectorAll('.nav-item').forEach(item=>{
+    item.addEventListener('click',()=>{
+      island.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+      item.classList.add('active');
+      item.style.transform='scale(0.9) translateY(0)';
+      setTimeout(()=>{ item.style.transform=''; },180);
+      if(window.matchMedia('(max-width:639px)').matches) setNavExpanded(false);
+    });
+    item.addEventListener('focus',()=>{ island.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); item.classList.add('active'); });
+  });
+})();
+
+</script>
+</body>
+</html>

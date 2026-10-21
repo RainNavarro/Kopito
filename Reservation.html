@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KoPito — Reserve</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+
+  <style>
+  /* ══════════════  TOKENS  ══════════════ */
+  :root {
+    --espresso:    #110700;
+    --roast:       #1e0d04;
+    --mahogany:    #5c2710;
+    --caramel:     #a0522d;
+    --crema:       #e8d5b0;
+    --foam:        #f5ede0;
+    --gold:        #c9a84c;
+    --gold-light:  #e0c57a;
+    --surface:     #1c0e06;
+    --surface2:    #231209;
+    --border:      rgba(201,168,76,.14);
+    --muted:       rgba(232,213,176,.5);
+    --radius-pill: 9999px;
+    --radius-lg:   1.25rem;
+    --radius-md:   .875rem;
+    --ease-out:    cubic-bezier(0.22,1,0.36,1);
+    --spring:      cubic-bezier(0.34,1.56,0.64,1);
+    --transition:  cubic-bezier(0.34,1.56,0.64,1);
+    --nav-bg:      rgba(20,8,2,0.82);
+    --nav-blur:    blur(24px);
+  }
+
+  *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+
+  body {
+    font-family:'DM Sans',sans-serif;
+    background:var(--espresso);
+    color:var(--crema);
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+
+  /* grain overlay */
+  body::after {
+    content:''; position:fixed; inset:0;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size:180px; opacity:.038; pointer-events:none; z-index:9998;
+  }
+
+  /* ══════════════  TOP BAR  ══════════════ */
+  .top-bar {
+    position:sticky; top:0; z-index:500;
+    background:rgba(17,7,0,.9);
+    backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+    border-bottom:1px solid var(--border);
+    padding:.7rem 1.25rem;
+    display:flex; align-items:center; gap:.75rem;
+  }
+  .top-bar__brand {
+    font-family:'Cormorant Garamond',serif;
+    font-size:1.45rem; font-weight:300; color:var(--foam);
+    text-decoration:none; letter-spacing:.05em; flex-shrink:0;
+  }
+  .top-bar__brand em { font-style:italic; color:var(--gold); }
+  .top-bar__title {
+    flex:1; text-align:center;
+    font-family:'DM Serif Display',serif;
+    font-size:1rem; color:var(--muted); letter-spacing:.06em;
+  }
+  .top-bar__spacer { flex-shrink:0; width:5rem; }
+
+  /* ══════════════  PAGE HERO  ══════════════ */
+  .page-hero {
+    position:relative; overflow:hidden;
+    padding:3rem 1.25rem 2.5rem;
+    text-align:center;
+  }
+  .page-hero::before {
+    content:''; position:absolute; inset:0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(92,39,16,.45) 0%, transparent 70%),
+      url('https://images.unsplash.com/photo-1511920170033-f8396924c348?w=1200&q=70&auto=format') center/cover no-repeat;
+    opacity:.35;
+  }
+  .page-hero::after {
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(to bottom, rgba(17,7,0,.4) 0%, var(--espresso) 100%);
+  }
+  .page-hero__inner { position:relative; z-index:1; }
+  .page-hero__eyebrow {
+    display:inline-flex; align-items:center; gap:.5rem;
+    font-size:.68rem; letter-spacing:.25em; text-transform:uppercase;
+    color:var(--gold); margin-bottom:.8rem;
+    animation:fadeUp .8s var(--ease-out) .1s both;
+  }
+  .page-hero__eyebrow::before,.page-hero__eyebrow::after {
+    content:''; display:block; width:1.5rem; height:1px; background:var(--gold); opacity:.5;
+  }
+  .page-hero h1 {
+    font-family:'DM Serif Display',serif;
+    font-size:clamp(2rem,8vw,3.5rem);
+    color:var(--foam); line-height:1.05; margin-bottom:.75rem;
+    animation:fadeUp .9s var(--ease-out) .25s both;
+  }
+  .page-hero h1 em { font-style:italic; color:var(--gold-light); }
+  .page-hero p {
+    font-size:.9rem; color:var(--muted); max-width:32rem; margin-inline:auto; line-height:1.7;
+    animation:fadeUp .9s var(--ease-out) .4s both;
+  }
+
+  /* ══════════════  TYPE SELECTOR  ══════════════ */
+  .type-section {
+    padding:1.5rem 1.25rem .5rem;
+    animation:fadeUp .9s var(--ease-out) .5s both;
+  }
+  .section-label {
+    font-size:.65rem; letter-spacing:.2em; text-transform:uppercase;
+    color:var(--gold); margin-bottom:.85rem;
+    display:flex; align-items:center; gap:.6rem;
+  }
+  .section-label::after { content:''; flex:1; height:1px; background:rgba(201,168,76,.18); }
+
+  .type-grid {
+    display:grid; grid-template-columns:repeat(2,1fr); gap:.75rem;
+  }
+  @media(min-width:480px){ .type-grid { grid-template-columns:repeat(4,1fr); } }
+
+  .type-card {
+    position:relative; overflow:hidden;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-lg);
+    padding:1.1rem .85rem;
+    cursor:pointer; text-align:center;
+    transition:transform .4s var(--spring), border-color .3s, background .3s, box-shadow .4s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .type-card:hover { transform:translateY(-4px); border-color:rgba(201,168,76,.35); }
+  .type-card.selected {
+    background:rgba(201,168,76,.1);
+    border-color:var(--gold);
+    box-shadow:0 0 0 1px rgba(201,168,76,.25), 0 8px 30px rgba(0,0,0,.4);
+  }
+  .type-card__icon {
+    font-size:1.75rem; display:block; margin-bottom:.5rem;
+    transition:transform .4s var(--spring);
+  }
+  .type-card:hover .type-card__icon, .type-card.selected .type-card__icon {
+    transform:scale(1.15);
+  }
+  .type-card__name {
+    font-size:.8rem; font-weight:600; color:var(--foam);
+    letter-spacing:.04em;
+  }
+  .type-card__sub {
+    font-size:.68rem; color:var(--muted); margin-top:.2rem; line-height:1.4;
+  }
+  /* selected check */
+  .type-card__check {
+    position:absolute; top:.5rem; right:.5rem;
+    width:1.1rem; height:1.1rem; border-radius:50%;
+    background:var(--gold); display:flex; align-items:center; justify-content:center;
+    opacity:0; transform:scale(0);
+    transition:opacity .3s, transform .4s var(--spring);
+  }
+  .type-card.selected .type-card__check { opacity:1; transform:scale(1); }
+  .type-card__check svg { width:9px; height:9px; stroke:var(--espresso); fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
+
+  /* ══════════════  BOOTH TOGGLE  ══════════════ */
+  .booth-toggle {
+    margin:1.25rem 1.25rem 0;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-lg);
+    padding:1rem 1.1rem;
+    display:flex; align-items:center; justify-content:space-between; gap:1rem;
+    cursor:pointer;
+    transition:border-color .3s, background .3s;
+    animation:fadeUp .9s var(--ease-out) .6s both;
+  }
+  .booth-toggle:hover { border-color:rgba(201,168,76,.3); }
+  .booth-toggle__title {
+    font-size:.9rem; font-weight:600; color:var(--foam);
+    display:flex; align-items:center; gap:.5rem;
+  }
+  .booth-badge {
+    font-size:.6rem; padding:.15rem .55rem; border-radius:var(--radius-pill);
+    background:rgba(201,168,76,.15); color:var(--gold);
+    letter-spacing:.1em; text-transform:uppercase;
+  }
+  .booth-toggle__sub { font-size:.78rem; color:var(--muted); margin-top:.2rem; }
+
+  /* Toggle switch */
+  .toggle-switch {
+    position:relative; width:2.8rem; height:1.6rem; flex-shrink:0;
+  }
+  .toggle-switch input { opacity:0; width:0; height:0; }
+  .toggle-track {
+    position:absolute; inset:0;
+    background:rgba(255,255,255,.08);
+    border:1px solid var(--border);
+    border-radius:var(--radius-pill);
+    transition:background .3s, border-color .3s;
+    cursor:pointer;
+  }
+  .toggle-switch input:checked + .toggle-track {
+    background:rgba(201,168,76,.25);
+    border-color:rgba(201,168,76,.5);
+  }
+  .toggle-track::after {
+    content:''; position:absolute;
+    width:1.1rem; height:1.1rem; border-radius:50%;
+    background:var(--muted); top:.2rem; left:.2rem;
+    transition:transform .4s var(--spring), background .3s;
+    box-shadow:0 2px 6px rgba(0,0,0,.4);
+  }
+  .toggle-switch input:checked + .toggle-track::after {
+    transform:translateX(1.2rem);
+    background:var(--gold);
+  }
+
+  /* ══════════════  FORM  ══════════════ */
+  .form-wrap {
+    padding:1.5rem 1.25rem 9rem;
+    display:flex; flex-direction:column; gap:1.25rem;
+    animation:fadeUp .9s var(--ease-out) .7s both;
+  }
+
+  .form-row {
+    display:grid; grid-template-columns:1fr; gap:1rem;
+  }
+  @media(min-width:640px){ .form-row.two { grid-template-columns:1fr 1fr; } }
+
+  .field { display:flex; flex-direction:column; gap:.45rem; }
+  .field__label {
+    font-size:.65rem; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--gold); font-weight:500;
+  }
+
+  .field input,
+  .field select,
+  .field textarea {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-md);
+    padding:.8rem 1rem;
+    font-family:'DM Sans',sans-serif;
+    font-size:.9rem; color:var(--foam);
+    outline:none;
+    transition:border-color .3s, background .3s, box-shadow .3s;
+    -webkit-appearance:none; appearance:none;
+    width:100%;
+  }
+  .field input::placeholder,
+  .field textarea::placeholder { color:var(--muted); }
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    border-color:rgba(201,168,76,.5);
+    background:rgba(28,14,6,.8);
+    box-shadow:0 0 0 3px rgba(201,168,76,.08);
+  }
+  .field textarea { resize:vertical; min-height:100px; line-height:1.6; }
+
+  /* Date/time icon wrapper */
+  .field__icon-wrap { position:relative; }
+  .field__icon-wrap input { padding-left:2.75rem; }
+  .field__icon {
+    position:absolute; left:.85rem; top:50%; transform:translateY(-50%);
+    width:16px; height:16px; stroke:var(--gold); fill:none;
+    stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round;
+    pointer-events:none;
+  }
+
+  /* Select arrow */
+  .field__select-wrap { position:relative; }
+  .field__select-wrap select { padding-right:2.5rem; }
+  .field__select-arrow {
+    position:absolute; right:.9rem; top:50%; transform:translateY(-50%);
+    width:14px; height:14px; stroke:var(--gold); fill:none;
+    stroke-width:2; stroke-linecap:round; stroke-linejoin:round;
+    pointer-events:none;
+  }
+  .field select option { background:#1c0e06; color:var(--foam); }
+
+  /* Color-coded input states */
+  .field input.valid { border-color:rgba(74,222,128,.4); }
+  .field input.invalid { border-color:rgba(226,58,45,.4); }
+  .field__hint { font-size:.72rem; color:var(--muted); margin-top:.1rem; }
+  .field__error { font-size:.72rem; color:#e23a2d; margin-top:.1rem; display:none; }
+  .field.has-error .field__error { display:block; }
+  .field.has-error input, .field.has-error select, .field.has-error textarea {
+    border-color:rgba(226,58,45,.45);
+  }
+
+  /* Luzon location tag pills */
+  .luzon-pills {
+    display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.4rem;
+  }
+  .luzon-pill {
+    padding:.28rem .75rem; border-radius:var(--radius-pill);
+    background:rgba(255,255,255,.05); border:1px solid rgba(201,168,76,.15);
+    font-size:.72rem; color:var(--muted);
+    cursor:pointer;
+    transition:background .3s, border-color .3s, color .3s, transform .3s var(--spring);
+  }
+  .luzon-pill:hover { background:rgba(201,168,76,.1); border-color:rgba(201,168,76,.35); color:var(--crema); }
+  .luzon-pill.selected {
+    background:rgba(201,168,76,.15); border-color:var(--gold); color:var(--gold-light); font-weight:600;
+    transform:translateY(-1px);
+  }
+
+  /* Guest count stepper */
+  .stepper {
+    display:flex; align-items:center; gap:1rem;
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius-md); padding:.6rem 1rem;
+    width:fit-content;
+  }
+  .stepper__btn {
+    width:2rem; height:2rem; border-radius:50%; border:1px solid rgba(201,168,76,.25);
+    background:rgba(201,168,76,.08); color:var(--crema);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-size:1.1rem; font-weight:600;
+    transition:background .2s, transform .3s var(--spring);
+  }
+  .stepper__btn:hover { background:rgba(201,168,76,.2); transform:scale(1.1); }
+  .stepper__val { font-family:'Cormorant Garamond',serif; font-size:1.5rem; min-width:2rem; text-align:center; color:var(--foam); }
+  .stepper__label { font-size:.78rem; color:var(--muted); }
+
+  /* Summary card */
+  .summary-card {
+    background:var(--surface2);
+    border:1px solid rgba(201,168,76,.18);
+    border-radius:var(--radius-lg);
+    padding:1.25rem;
+  }
+  .summary-card__title {
+    font-family:'DM Serif Display',serif;
+    font-size:1.1rem; color:var(--foam);
+    margin-bottom:1rem;
+    display:flex; align-items:center; gap:.6rem;
+  }
+  .summary-card__title svg { width:16px; height:16px; stroke:var(--gold); fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  .summary-row {
+    display:flex; justify-content:space-between; align-items:flex-start;
+    padding:.4rem 0; border-bottom:1px solid rgba(201,168,76,.07);
+    font-size:.83rem;
+  }
+  .summary-row:last-child { border-bottom:none; }
+  .summary-row__key { color:var(--muted); }
+  .summary-row__val { color:var(--crema); font-weight:500; text-align:right; max-width:60%; }
+  .summary-row__val.empty { color:rgba(232,213,176,.25); font-style:italic; }
+
+  /* CTA */
+  .submit-btn {
+    width:100%; padding:.95rem;
+    border-radius:var(--radius-pill); border:none;
+    background:linear-gradient(135deg,var(--caramel),var(--mahogany));
+    color:var(--foam); font-family:'DM Sans',sans-serif;
+    font-size:.95rem; font-weight:600; cursor:pointer; letter-spacing:.03em;
+    box-shadow:0 4px 24px rgba(92,39,16,.5);
+    transition:transform .35s var(--spring), box-shadow .3s, opacity .3s;
+    display:flex; align-items:center; justify-content:center; gap:.5rem;
+  }
+  .submit-btn:hover { transform:translateY(-2px); box-shadow:0 8px 32px rgba(92,39,16,.7); }
+  .submit-btn:disabled { opacity:.45; cursor:not-allowed; transform:none; }
+  .submit-btn svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+
+  /* ══════════════  SUCCESS OVERLAY  ══════════════ */
+  .success-overlay {
+    position:fixed; inset:0; z-index:4000;
+    background:rgba(0,0,0,.8);
+    backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+    display:flex; align-items:center; justify-content:center;
+    padding:1.25rem;
+    opacity:0; pointer-events:none;
+    transition:opacity .4s ease;
+  }
+  .success-overlay.show { opacity:1; pointer-events:auto; }
+  .success-card {
+    background:var(--surface);
+    border:1px solid rgba(201,168,76,.25);
+    border-radius:var(--radius-lg);
+    padding:2.5rem 2rem;
+    max-width:420px; width:100%;
+    text-align:center;
+    transform:translateY(30px) scale(.96);
+    transition:transform .5s var(--ease-out);
+  }
+  .success-overlay.show .success-card { transform:none; }
+  .success-icon {
+    width:4rem; height:4rem; border-radius:50%;
+    background:rgba(74,222,128,.12);
+    border:1px solid rgba(74,222,128,.3);
+    display:flex; align-items:center; justify-content:center;
+    margin:0 auto 1.25rem;
+  }
+  .success-icon svg { width:1.75rem; height:1.75rem; stroke:#4ade80; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
+  .success-card h2 {
+    font-family:'DM Serif Display',serif;
+    font-size:1.75rem; color:var(--foam); margin-bottom:.5rem;
+  }
+  .success-card p { font-size:.88rem; color:var(--muted); line-height:1.6; margin-bottom:1.75rem; }
+  .success-ref {
+    display:inline-block;
+    font-family:'Cormorant Garamond',serif;
+    font-size:1.2rem; color:var(--gold);
+    background:rgba(201,168,76,.08);
+    border:1px solid rgba(201,168,76,.25);
+    border-radius:var(--radius-md);
+    padding:.5rem 1.25rem; margin-bottom:1.75rem;
+    letter-spacing:.12em;
+  }
+  .success-actions { display:flex; flex-direction:column; gap:.65rem; }
+  .btn-ghost {
+    padding:.75rem; border-radius:var(--radius-pill);
+    background:rgba(255,255,255,.05); border:1px solid var(--border);
+    color:var(--crema); font-family:'DM Sans',sans-serif;
+    font-size:.88rem; cursor:pointer; text-decoration:none; text-align:center;
+    transition:background .3s, border-color .3s;
+    display:block;
+  }
+  .btn-ghost:hover { background:rgba(201,168,76,.1); border-color:rgba(201,168,76,.35); }
+
+  /* ═══════════════════════════════ DYNAMIC ISLAND NAV ═══════════════════════════════ */
+  .nav-island {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    transform: none;
+    z-index: 10000;
+
+    /* Island pill shape */
+    background: var(--nav-bg);
+    backdrop-filter: var(--nav-blur);
+    -webkit-backdrop-filter: var(--nav-blur);
+    border: 1px solid rgba(201, 168, 76, 0.18);
+    border-radius: var(--radius-pill);
+    box-shadow:
+      0 8px 40px rgba(0,0,0,0.7),
+      0 1px 0 rgba(201,168,76,0.08) inset,
+      0 -1px 0 rgba(0,0,0,0.3) inset;
+
+    /* Transition: liquid morph */
+    transition:
+      width 0.55s var(--transition),
+      padding 0.4s var(--ease-out),
+      border-radius 0.55s var(--transition),
+      box-shadow 0.4s ease;
+
+    /* Default: compact pill */
+    width: min(340px, 90vw);
+    padding: 0.45rem 0.6rem;
+  }
+
+  /* Expanded state (on tap/hover for desktop) */
+  .nav-island:hover,
+  .nav-island.expanded {
+    width: min(420px, 92vw);
+    box-shadow:
+      0 16px 60px rgba(0,0,0,0.8),
+      0 1px 0 rgba(201,168,76,0.15) inset,
+      0 -1px 0 rgba(0,0,0,0.3) inset;
+  }
+
+  .nav-island__inner {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+
+  .nav-item {
+    display: flex;
+    flex: 1 1 0;
+    min-width: 0;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.45rem 0.65rem;
+    border-radius: var(--radius-pill);
+    text-decoration: none;
+    color: rgba(232, 213, 176, 0.55);
+    cursor: pointer;
+    transition:
+      color 0.3s ease,
+      background 0.3s ease,
+      transform 0.4s var(--transition);
+    -webkit-tap-highlight-color: transparent;
+    position: relative;
+  }
+
+  .nav-item:hover,
+  .nav-item.active {
+    color: var(--foam);
+    transform: translateY(-1px);
+  }
+
+  .nav-item.active {
+    background: rgba(201, 168, 76, 0.12);
+  }
+
+  .nav-item__icon {
+    position: relative;
+    width: 22px;
+    height: 22px;
+  }
+
+  .nav-item__icon svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.4s var(--transition);
+  }
+
+  .nav-item:hover .nav-item__icon svg,
+  .nav-item.active .nav-item__icon svg {
+    transform: scale(1.18);
+  }
+
+  /* Gold dot for active */
+  .nav-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 3.5px;
+    height: 3.5px;
+    background: var(--gold);
+    border-radius: 50%;
+    animation: dotPop 0.4s var(--transition) forwards;
+  }
+
+  @keyframes dotPop {
+    0%   { transform: translateX(-50%) scale(0); }
+    100% { transform: translateX(-50%) scale(1); }
+  }
+
+  .nav-item__label {
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    opacity: 0;
+    max-width: 0;
+    overflow: hidden;
+    transition: opacity 0.3s ease, max-width 0.5s var(--ease-out);
+  }
+
+  /* Labels visible on wider nav or active item on desktop */
+  @media (min-width: 480px) {
+    .nav-item__label { opacity: 1; max-width: 60px; }
+    .nav-island { padding: 0.5rem 0.75rem; }
+  }
+
+  @media (min-width: 768px) {
+    .nav-island { bottom: 2rem; }
+  }
+
+  @media (min-width: 1024px) {
+    .nav-item { padding: 0.6rem 1.1rem; }
+  }
+
+  /* Active item always shows label on mobile too */
+  .nav-item.active .nav-item__label {
+    opacity: 1;
+    max-width: 60px;
+    color: var(--gold-light);
+  }
+
+  /* Cart badge */
+  .nav-item__badge {
+    position: absolute;
+    top: -2px;
+    right: -4px;
+    width: 14px;
+    height: 14px;
+    background: var(--gold);
+    color: var(--espresso);
+    border-radius: 50%;
+    font-size: 0.55rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: badgePop 0.4s var(--transition) forwards;
+    display: none; /* shown via JS */
+  }
+
+  @media (min-width: 1024px) {
+    .nav-item { padding: 0.6rem 1.1rem; }
+  }
+
+  /* Separator dot in island */
+  .nav-sep {
+    width: 1px;
+    height: 20px;
+    background: rgba(201,168,76,0.15);
+    flex-shrink: 0;
+  }
+
+  .nav-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: transparent;
+    color: var(--crema);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .nav-toggle svg {
+    width: 1.35rem;
+    height: 1.35rem;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+
+  @media (max-width: 639px) {
+    .nav-island {
+      left: auto;
+      right: max(1rem, env(safe-area-inset-right));
+      bottom: max(1rem, env(safe-area-inset-bottom));
+      width: auto;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    .nav-island:hover,
+    .nav-island.expanded {
+      width: auto;
+      box-shadow: none;
+    }
+
+    .nav-toggle {
+      display: flex;
+      width: 3.25rem;
+      height: 3.25rem;
+      border-radius: 50%;
+      background: var(--nav-bg);
+      border: 1px solid rgba(201,168,76,0.22);
+      color: var(--gold-light);
+      box-shadow: 0 10px 36px rgba(0,0,0,0.62), 0 1px 0 rgba(201,168,76,0.12) inset;
+      backdrop-filter: var(--nav-blur);
+      -webkit-backdrop-filter: var(--nav-blur);
+    }
+
+    .nav-island__inner {
+      position: absolute;
+      right: 0;
+      bottom: calc(100% + 0.75rem);
+      width: min(14rem, calc(100vw - 2rem));
+      padding: 0.6rem;
+      flex-direction: column;
+      align-items: stretch;
+      flex-wrap: nowrap;
+      gap: 0.25rem;
+      background: var(--nav-bg);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 18px 55px rgba(0,0,0,0.72);
+      backdrop-filter: var(--nav-blur);
+      -webkit-backdrop-filter: var(--nav-blur);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(0.6rem) scale(0.96);
+      transform-origin: bottom right;
+      transition: opacity 0.25s ease, transform 0.3s var(--ease-out);
+    }
+
+    .nav-island.expanded .nav-island__inner {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+
+    .nav-item {
+      flex: none;
+      flex-direction: row;
+      justify-content: flex-start;
+      gap: 0.7rem;
+      padding: 0.72rem 0.85rem;
+    }
+
+    .nav-item__icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .nav-item__label {
+      opacity: 1;
+      max-width: none;
+      font-size: 0.72rem;
+    }
+
+    .nav-item.active::after {
+      left: auto;
+      right: 0.85rem;
+      top: 50%;
+      bottom: auto;
+      transform: translateY(-50%);
+      width: 5px;
+      height: 5px;
+      animation: none;
+    }
+
+    .nav-sep { display: none; }
+  }
+
+  /* ══════════════  KEYFRAMES  ══════════════ */
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(22px); }
+    to   { opacity:1; transform:none; }
+  }
+  ::-webkit-scrollbar { width:4px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:rgba(201,168,76,.2); border-radius:2px; }
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;}}
+  </style>
+</head>
+<body>
+
+<!-- ══════════════  TOP BAR  ══════════════ -->
+<header class="top-bar">
+  <a href="Home.html" class="top-bar__brand">Ko<em>Pito</em></a>
+  <span class="top-bar__title">Reservations</span>
+  <span class="top-bar__spacer"></span>
+</header>
+
+<!-- ══════════════  PAGE HERO  ══════════════ -->
+<section class="page-hero">
+  <div class="page-hero__inner">
+    <div class="page-hero__eyebrow">Book Your Moment</div>
+    <h1>Reserve or <em>Hire</em> Us</h1>
+    <p>Book the café for a private event or bring the KoPito Coffee Booth to your celebration anywhere in Luzon.</p>
+  </div>
+</section>
+
+<!-- ══════════════  EVENT TYPE  ══════════════ -->
+<section class="type-section">
+  <div class="section-label">Event Type</div>
+  <div class="type-grid" id="typeGrid">
+    <div class="type-card" data-type="Wedding">
+      <div class="type-card__check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <span class="type-card__icon">💍</span>
+      <div class="type-card__name">Wedding</div>
+      <div class="type-card__sub">Bridal showers & receptions</div>
+    </div>
+    <div class="type-card" data-type="Corporate">
+      <div class="type-card__check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <span class="type-card__icon">🏢</span>
+      <div class="type-card__name">Corporate</div>
+      <div class="type-card__sub">Meetings, launches & seminars</div>
+    </div>
+    <div class="type-card" data-type="Birthday">
+      <div class="type-card__check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <span class="type-card__icon">🎂</span>
+      <div class="type-card__name">Birthday</div>
+      <div class="type-card__sub">Intimate or grand celebrations</div>
+    </div>
+    <div class="type-card" data-type="Other">
+      <div class="type-card__check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <span class="type-card__icon">🎉</span>
+      <div class="type-card__name">Other</div>
+      <div class="type-card__sub">Tell us what you need</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════  BOOTH HIRE TOGGLE  ══════════════ -->
+<label class="booth-toggle" id="boothToggle">
+  <div class="booth-toggle__info">
+    <div class="booth-toggle__title">
+      ☕ Mobile Coffee Booth
+      <span class="booth-badge">Luzon Only</span>
+    </div>
+    <div class="booth-toggle__sub">Bring KoPito to your venue — we handle everything</div>
+  </div>
+  <label class="toggle-switch">
+    <input type="checkbox" id="boothCheck"/>
+    <div class="toggle-track"></div>
+  </label>
+</label>
+
+<!-- ══════════════  MAIN FORM  ══════════════ -->
+<form class="form-wrap" id="reservationForm" novalidate>
+
+  <!-- Date & Time -->
+  <div class="section-label" style="padding:0">Date &amp; Time</div>
+  <div class="form-row two">
+    <div class="field" id="fieldDate">
+      <label class="field__label" for="eventDate">Event Date</label>
+      <div class="field__icon-wrap">
+        <svg class="field__icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <input type="date" id="eventDate" name="eventDate" required/>
+      </div>
+      <span class="field__error">Please select a date.</span>
+    </div>
+    <div class="field" id="fieldTime">
+      <label class="field__label" for="eventTime">Start Time</label>
+      <div class="field__icon-wrap">
+        <svg class="field__icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <input type="time" id="eventTime" name="eventTime" required/>
+      </div>
+      <span class="field__error">Please select a time.</span>
+    </div>
+  </div>
+
+  <div class="form-row two">
+    <div class="field">
+      <label class="field__label" for="duration">Duration</label>
+      <div class="field__select-wrap">
+        <select id="duration" name="duration">
+          <option value="2">2 hours</option>
+          <option value="3">3 hours</option>
+          <option value="4">4 hours</option>
+          <option value="6">6 hours</option>
+          <option value="8">Full Day (8 hrs)</option>
+        </select>
+        <svg class="field__select-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field__label">Number of Guests</label>
+      <div class="stepper">
+        <button type="button" class="stepper__btn" id="guestMinus">−</button>
+        <span class="stepper__val" id="guestVal">30</span>
+        <button type="button" class="stepper__btn" id="guestPlus">+</button>
+        <span class="stepper__label">pax</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Location -->
+  <div class="section-label" style="padding:0" id="locationLabel">Location</div>
+
+  <div class="field" id="fieldVenue">
+    <label class="field__label" for="venue">Venue / Address</label>
+    <input type="text" id="venue" name="venue" placeholder="Venue name and full address" required/>
+    <span class="field__error">Venue is required.</span>
+  </div>
+
+  <!-- Luzon area pills (shown only when booth is ON) -->
+  <div class="field" id="luzonSection" style="display:none">
+    <label class="field__label">Luzon Region</label>
+    <div class="luzon-pills" id="luzonPills">
+      <span class="luzon-pill" data-region="Metro Manila">Metro Manila</span>
+      <span class="luzon-pill" data-region="Cavite">Cavite</span>
+      <span class="luzon-pill" data-region="Laguna">Laguna</span>
+      <span class="luzon-pill" data-region="Batangas">Batangas</span>
+      <span class="luzon-pill" data-region="Rizal">Rizal</span>
+      <span class="luzon-pill" data-region="Bulacan">Bulacan</span>
+      <span class="luzon-pill" data-region="Pampanga">Pampanga</span>
+      <span class="luzon-pill" data-region="Quezon">Quezon</span>
+      <span class="luzon-pill" data-region="Ilocos Norte">Ilocos Norte</span>
+      <span class="luzon-pill" data-region="Ilocos Sur">Ilocos Sur</span>
+    </div>
+    <span class="field__hint">Tap your region — delivery fees may apply outside Cavite</span>
+  </div>
+
+  <!-- Contact Details -->
+  <div class="section-label" style="padding:0">Contact Details</div>
+
+  <div class="form-row two">
+    <div class="field" id="fieldName">
+      <label class="field__label" for="contactName">Full Name</label>
+      <input type="text" id="contactName" name="contactName" placeholder="Your full name" required/>
+      <span class="field__error">Name is required.</span>
+    </div>
+    <div class="field" id="fieldPhone">
+      <label class="field__label" for="contactPhone">Phone Number</label>
+      <input type="tel" id="contactPhone" name="contactPhone" placeholder="+63 9XX XXX XXXX" required pattern="[0-9+\s\-]{10,15}"/>
+      <span class="field__error">Enter a valid PH number.</span>
+    </div>
+  </div>
+
+  <div class="field" id="fieldEmail">
+    <label class="field__label" for="contactEmail">Email Address</label>
+    <input type="email" id="contactEmail" name="contactEmail" placeholder="your@email.com" required/>
+    <span class="field__error">Enter a valid email.</span>
+  </div>
+
+  <div class="field">
+    <label class="field__label" for="notes">Special Requests</label>
+    <textarea id="notes" name="notes" placeholder="Menu preferences, setup requirements, allergies, anything we should know…"></textarea>
+  </div>
+
+  <!-- Booking Summary -->
+  <div class="summary-card" id="summaryCard">
+    <div class="summary-card__title">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Booking Summary
+    </div>
+    <div class="summary-row">
+      <span class="summary-row__key">Event Type</span>
+      <span class="summary-row__val empty" id="sumType">Not selected</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-row__key">Date</span>
+      <span class="summary-row__val empty" id="sumDate">—</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-row__key">Time</span>
+      <span class="summary-row__val empty" id="sumTime">—</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-row__key">Duration</span>
+      <span class="summary-row__val" id="sumDuration">2 hours</span>
+    </div>
+    <div class="summary-row">
+      <span class="summary-row__key">Guests</span>
+      <span class="summary-row__val" id="sumGuests">30 pax</span>
+    </div>
+    <div class="summary-row" id="sumBoothRow" style="display:none">
+      <span class="summary-row__key">☕ Mobile Booth</span>
+      <span class="summary-row__val" style="color:var(--gold)">Requested</span>
+    </div>
+  </div>
+
+  <!-- Submit -->
+  <button type="submit" class="submit-btn" id="submitBtn">
+    <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.06 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+    Send Reservation Request
+  </button>
+</form>
+
+<!-- ══════════════  SUCCESS OVERLAY  ══════════════ -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-card">
+    <div class="success-icon">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <h2>Request Sent!</h2>
+    <p>We've received your reservation request and will reach out within 24 hours to confirm details.</p>
+    <div class="success-ref" id="successRef">KP-000000</div>
+    <div class="success-actions">
+      <a href="Menu.HTML" class="submit-btn" style="text-decoration:none;display:flex;align-items:center;justify-content:center;gap:.5rem;">
+        <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M17 8h1a4 4 0 010 8h-1"/><path d="M3 8h14v9a4 4 0 01-4 4H7a4 4 0 01-4-4V8z"/></svg>
+        Browse Our Menu
+      </a>
+      <button class="btn-ghost" id="newBookingBtn">Make Another Booking</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════  DYNAMIC ISLAND NAV  ══════════════ -->
+<nav class="nav-island" id="navIsland" aria-label="Main navigation">
+  <button class="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="navMenu">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+  </button>
+  <div class="nav-island__inner" id="navMenu">
+    <a href="Home.html" class="nav-item" aria-label="Home">
+      <span class="nav-item__icon"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V21a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+      <span class="nav-item__label">Home</span>
+    </a>
+    <div class="nav-sep"></div>
+    <a href="Menu.HTML" class="nav-item" aria-label="Menu">
+      <span class="nav-item__icon"><svg viewBox="0 0 24 24"><path d="M17 8h1a4 4 0 010 8h-1"/><path d="M3 8h14v9a4 4 0 01-4 4H7a4 4 0 01-4-4V8z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg></span>
+      <span class="nav-item__label">Menu</span>
+    </a>
+    <div class="nav-sep"></div>
+    <a href="About.html" class="nav-item" aria-label="About">
+      <span class="nav-item__icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
+      <span class="nav-item__label">About</span>
+    </a>
+    <div class="nav-sep"></div>
+    <a href="Contact.HTML" class="nav-item active" aria-current="page" aria-label="Contact">
+      <span class="nav-item__icon"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.06 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></span>
+      <span class="nav-item__label">Contact</span>
+    </a>
+    <div class="nav-sep"></div>
+    <a href="Account.html" class="nav-item" aria-label="Account">
+      <span class="nav-item__icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+      <span class="nav-item__label">Account</span>
+    </a>
+  </div>
+</nav>
+
+<script>
+/* ── STATE ── */
+let selectedType = '';
+let selectedRegion = '';
+let guestCount = 30;
+let isBooth = false;
+
+/* ── EVENT TYPE SELECTION ── */
+document.querySelectorAll('.type-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.type-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    selectedType = card.dataset.type;
+    updateSummary();
+  });
+});
+
+/* ── BOOTH TOGGLE ── */
+document.getElementById('boothCheck').addEventListener('change', e => {
+  isBooth = e.target.checked;
+  const luzonSec = document.getElementById('luzonSection');
+  luzonSec.style.display = isBooth ? 'flex' : 'none';
+  document.getElementById('sumBoothRow').style.display = isBooth ? 'flex' : 'none';
+});
+
+/* ── LUZON REGION PILLS ── */
+document.querySelectorAll('.luzon-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.luzon-pill').forEach(p => p.classList.remove('selected'));
+    pill.classList.add('selected');
+    selectedRegion = pill.dataset.region;
+  });
+});
+
+/* ── GUEST STEPPER ── */
+document.getElementById('guestMinus').addEventListener('click', () => {
+  if (guestCount > 5) { guestCount -= 5; updateGuest(); }
+});
+document.getElementById('guestPlus').addEventListener('click', () => {
+  if (guestCount < 500) { guestCount += 5; updateGuest(); }
+});
+function updateGuest(){
+  document.getElementById('guestVal').textContent = guestCount;
+  document.getElementById('sumGuests').textContent = guestCount + ' pax';
+}
+
+/* ── LIVE SUMMARY ── */
+function updateSummary(){
+  const sumType = document.getElementById('sumType');
+  sumType.textContent = selectedType || 'Not selected';
+  sumType.className = 'summary-row__val' + (selectedType ? '' : ' empty');
+}
+
+document.getElementById('eventDate').addEventListener('change', e => {
+  const d = document.getElementById('sumDate');
+  if(e.target.value){
+    const dt = new Date(e.target.value + 'T00:00:00');
+    d.textContent = dt.toLocaleDateString('en-PH',{weekday:'short',year:'numeric',month:'long',day:'numeric'});
+    d.className = 'summary-row__val';
+  } else { d.textContent = '—'; d.className = 'summary-row__val empty'; }
+});
+
+document.getElementById('eventTime').addEventListener('change', e => {
+  const t = document.getElementById('sumTime');
+  if(e.target.value){
+    const [h,m] = e.target.value.split(':');
+    const dt = new Date(); dt.setHours(h,m);
+    t.textContent = dt.toLocaleTimeString('en-PH',{hour:'numeric',minute:'2-digit',hour12:true});
+    t.className = 'summary-row__val';
+  } else { t.textContent = '—'; t.className = 'summary-row__val empty'; }
+});
+
+document.getElementById('duration').addEventListener('change', e => {
+  document.getElementById('sumDuration').textContent = e.target.options[e.target.selectedIndex].text;
+});
+
+/* ── FORM VALIDATION & SUBMIT ── */
+document.getElementById('reservationForm').addEventListener('submit', e => {
+  e.preventDefault();
+  let valid = true;
+
+  const required = [
+    {field:'fieldDate', input:'eventDate', msg:'Please select a date.'},
+    {field:'fieldTime', input:'eventTime', msg:'Please select a time.'},
+    {field:'fieldVenue', input:'venue', msg:'Venue is required.'},
+    {field:'fieldName', input:'contactName', msg:'Name is required.'},
+    {field:'fieldPhone', input:'contactPhone', msg:'Enter a valid PH number.'},
+    {field:'fieldEmail', input:'contactEmail', msg:'Enter a valid email.'},
+  ];
+
+  required.forEach(r => {
+    const fieldEl = document.getElementById(r.field);
+    const inputEl = document.getElementById(r.input);
+    if (!inputEl.value.trim() || (inputEl.validity && !inputEl.validity.valid)) {
+      fieldEl.classList.add('has-error');
+      valid = false;
+    } else {
+      fieldEl.classList.remove('has-error');
+    }
+  });
+
+  if(!selectedType){ alert('Please select an event type.'); valid = false; }
+
+  if(!valid) return;
+
+  // Show success
+  const ref = 'KP-' + Math.floor(100000 + Math.random() * 900000);
+  document.getElementById('successRef').textContent = ref;
+  document.getElementById('successOverlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+});
+
+document.getElementById('newBookingBtn').addEventListener('click', () => {
+  document.getElementById('successOverlay').classList.remove('show');
+  document.body.style.overflow = '';
+  document.getElementById('reservationForm').reset();
+  document.querySelectorAll('.type-card').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('.luzon-pill').forEach(p => p.classList.remove('selected'));
+  document.getElementById('boothCheck').checked = false;
+  document.getElementById('luzonSection').style.display = 'none';
+  document.getElementById('sumBoothRow').style.display = 'none';
+  selectedType=''; selectedRegion=''; guestCount=30; isBooth=false;
+  document.getElementById('guestVal').textContent='30';
+  updateSummary();
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+
+/* ── DYNAMIC ISLAND NAV ── */
+const island = document.getElementById('navIsland');
+const navToggle = island.querySelector('.nav-toggle');
+let collapseT;
+function setNavExpanded(expanded) {
+  island.classList.toggle('expanded', expanded);
+  navToggle.setAttribute('aria-expanded', String(expanded));
+}
+island.addEventListener('mouseenter', () => {
+  clearTimeout(collapseT);
+  setNavExpanded(true);
+});
+island.addEventListener('mouseleave', () => {
+  collapseT = setTimeout(() => setNavExpanded(false), 600);
+});
+island.addEventListener('touchstart', () => {
+  clearTimeout(collapseT);
+  setNavExpanded(true);
+  collapseT = setTimeout(() => setNavExpanded(false), 3000);
+}, { passive:true });
+navToggle.addEventListener('touchstart', e => e.stopPropagation(), { passive:true });
+navToggle.addEventListener('click', e => {
+  e.stopPropagation();
+  clearTimeout(collapseT);
+  setNavExpanded(!island.classList.contains('expanded'));
+});
+document.addEventListener('click', e => {
+  if (window.matchMedia('(max-width: 639px)').matches && !island.contains(e.target)) setNavExpanded(false);
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') setNavExpanded(false); });
+const navItems = document.querySelectorAll('.nav-item');
+navItems.forEach(item => {
+  item.addEventListener('click', () => {
+    navItems.forEach(n => n.classList.remove('active'));
+    item.classList.add('active');
+    item.style.transform = 'scale(0.9) translateY(0)';
+    setTimeout(() => {
+      item.style.transform = '';
+    }, 180);
+  });
+});
+navItems.forEach(item => {
+  item.addEventListener('focus', () => {
+    navItems.forEach(n => n.classList.remove('active'));
+    item.classList.add('active');
+  });
+});
+
+/* ── SET MIN DATE TO TODAY ── */
+document.getElementById('eventDate').min = new Date().toISOString().split('T')[0];
+</script>
+</body>
+</html>
